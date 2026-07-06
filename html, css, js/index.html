@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="fr" data-theme="light">
+
+  <!--HEAD-->
+  <head>
+
+    <meta charset="UTF-8">
+    <meta name="viewport"    content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <meta name="description" content="SOKALI — La marketplace locale N°1 en Afrique. Achetez et vendez près de chez vous.">
+    <meta name="theme-color" content="#E8721A">
+
+    <!-- Open Graph -->
+    <meta property="og:title"       content="SOKALI | Marketplace locale">
+    <meta property="og:description" content="Des milliers d'annonces. Vends en 2 minutes.">
+    <meta property="og:type"        content="website">
+
+    <!-- Fonts — preconnect d'abord, import ensuite -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,700;9..144,900&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+    <!-- Icônes -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+
+    <!-- Styles -->
+    <link rel="stylesheet" href="style.css">
+
+    <title>SOKALI — Marketplace locale</title>
+
+  </head>
+
+
+  <!-- BODY -->
+  <body>
+
+
+    <!--  HEADER  -->
+    <header class="header">
+
+      <nav class="nav" aria-label="Navigation principale">
+
+        <!-- Logo -->
+        <a href="index.html" class="logo" aria-label="SOKALI — Retour à l'accueil">
+          <div class="logo-marque" aria-hidden="true">S</div>
+          <span>SOKA<span class="logo-accent">LI</span></span>
+        </a>
+
+        <!-- Recherche -->
+        <div class="search-wrapper" role="search">
+          <i class="fas fa-search" aria-hidden="true"></i>
+          <input
+            class="search-input"
+            type="search"
+            placeholder="Que recherchez-vous ?"
+            autocomplete="off"
+            aria-label="Rechercher des annonces"
+          >
+        </div>
+
+        <!-- Actions -->
+        <div class="nav-actions">
+          <button class="btn btn-orange" type="button">
+            <i class="fas fa-plus" aria-hidden="true"></i>
+            Publier
+          </button>
+          <button class="btn btn-vert" type="button">
+            <i class="fas fa-user" aria-hidden="true"></i>
+            Se connecter
+          </button>
+        </div>
+
+      </nav>
+
+    </header>
+    <!-- /header -->
+
+
+    <!--MAIN  -->
+    <main>
+
+
+      <!-- SECTION : HERO  -->
+      <section class="hero" aria-labelledby="hero-titre">
+
+        <!-- Badge -->
+        <div class="hero-badge">
+          <span class="hero-badge-dot" aria-hidden="true"></span>
+          La marketplace locale N°1 en Afrique
+        </div>
+
+        <!-- Titre principal -->
+        <h1 id="hero-titre">
+          Achète. Vends.<br>
+          Localement avec <span class="gradient-texte">SOKALI</span>.
+        </h1>
+
+        <!-- Description -->
+        <p class="hero-description">
+          Des milliers d'annonces près de chez toi. Trouve le bon deal ou vends
+          en 2 minutes — directement entre particuliers, en toute confiance.
+        </p>
+
+        <!-- Boutons -->
+        <div class="hero-ctas">
+          <button class="btn btn-orange btn-large" type="button">
+            <i class="fas fa-plus-circle" aria-hidden="true"></i>
+            Publier une annonce
+          </button>
+          <button class="btn btn-verre btn-large" type="button">
+            <i class="fas fa-compass" aria-hidden="true"></i>
+            Explorer les annonces
+          </button>
+        </div>
+
+      </section>
+
+      <div class="trust-bar">
+         <div class="trust-in w">
+            <div class="trust-item"><i class="fas fa-shield-alt" aria-hidden="true"></i><span>Vendeurs vérifiés</span></div>
+            <div class="trust-item"><i class="fas fa-bolt" aria-hidden="true"></i><span>Vente en 2 minutes</span></div>
+            <div class="trust-item"><i class="fas fa-map-marker-alt" aria-hidden="true"></i><span>Annonces locales</span></div>
+            <div class="trust-item"><i class="fas fa-comment-dots" aria-hidden="true"></i><span>Chat intégré</span></div>
+            <div class="trust-item"><i class="fas fa-star" aria-hidden="true"></i><span>98% de satisfaction</span></div>
+         </div>
+      </div>
+      <!-- /hero -->
+
+
+      <!--  SECTION : CATÉGORIES  -->
+      <section class="categories" aria-labelledby="categories-titre">
+
+        <!-- En-tête de section -->
+        <div class="section-entete">
+          <h2 id="categories-titre" style="font-size: 22px;">Toutes les catégories</h2>
+          <p class="section-sous-titre">Explorez par univers</p>
+        </div>
+
+        <!-- Grille -->
+        <div class="categories-grille" role="list">
+
+          <button class="categorie-item" type="button" role="listitem" aria-label="Électronique — 8 420 annonces">
+            <div class="categorie-icone" aria-hidden="true"><i class="fas fa-mobile-alt"></i></div>
+            <span class="categorie-nom">Électronique</span>
+            <span class="categorie-count">8 420 annonces</span>
+          </button>
+
+          <button class="categorie-item" type="button" role="listitem" aria-label="Véhicules — 5 180 annonces">
+            <div class="categorie-icone" aria-hidden="true"><i class="fas fa-car"></i></div>
+            <span class="categorie-nom">Véhicules</span>
+            <span class="categorie-count">5 180 annonces</span>
+          </button>
+
+          <button class="categorie-item" type="button" role="listitem" aria-label="Immobilier — 4 310 annonces">
+            <div class="categorie-icone" aria-hidden="true"><i class="fas fa-home"></i></div>
+            <span class="categorie-nom">Immobilier</span>
+            <span class="categorie-count">4 310 annonces</span>
+          </button>
+
+          <button class="categorie-item" type="button" role="listitem" aria-label="Mode — 6 750 annonces">
+            <div class="categorie-icone" aria-hidden="true"><i class="fas fa-tshirt"></i></div>
+            <span class="categorie-nom">Mode</span>
+            <span class="categorie-count">6 750 annonces</span>
+          </button>
+
+          <button class="categorie-item" type="button" role="listitem" aria-label="Maison — 3 200 annonces">
+            <div class="categorie-icone" aria-hidden="true"><i class="fas fa-couch"></i></div>
+            <span class="categorie-nom">Maison</span>
+            <span class="categorie-count">3 200 annonces</span>
+          </button>
+
+          <button class="categorie-item" type="button" role="listitem" aria-label="Services — 2 840 annonces">
+            <div class="categorie-icone" aria-hidden="true"><i class="fas fa-briefcase"></i></div>
+            <span class="categorie-nom">Services</span>
+            <span class="categorie-count">2 840 annonces</span>
+          </button>
+
+          <button class="categorie-item" type="button" role="listitem" aria-label="Loisirs — 1 900 annonces">
+            <div class="categorie-icone" aria-hidden="true"><i class="fas fa-gamepad"></i></div>
+            <span class="categorie-nom">Loisirs</span>
+            <span class="categorie-count">1 900 annonces</span>
+          </button>
+
+        </div>
+        <!-- /categories-grille -->
+
+      </section>
+      <!-- /categories -->
+
+
+      <!-- SECTION : ANNONCES  -->
+      <section class="annonces" aria-labelledby="annonces-titre">
+
+        <div class="section-entete">
+          <h2 id="annonces-titre" style="font-size: 22px;">Annonces à la une</h2>
+          <p class="section-sous-titre">Les meilleures offres du moment</p>
+        </div>
+        <div class="filtre">
+        <button class="btn btn-filtre"> <i class="fas fa-sliders-h" aria-hidden="true"></i> Filtrer & Trier </button>
+        </div>
+        <!-- grille de cards -->
+        
+      </section>
+      <!-- /annonces -->
+
+
+    </main>
+    <!-- /main -->
+
+
+    <!-- FOOTER -->
+    <footer class="footer" role="contentinfo">
+      <p>
+        © 2026 SOKALI. Fait avec
+        <i class="fas fa-heart" style="color:var(--p)" aria-label="amour" role="img"></i>
+        pour l'Afrique.
+      </p>
+    </footer>
+    <!-- /footer -->
+
+
+  </body>
+
+</html>
