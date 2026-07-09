@@ -21,12 +21,7 @@ pipeline {
             }
         }
 
-        stage('Installation de Playwright') {
-            steps {
-                bat 'npx playwright install'
-            }
-        }
-
+        
         stage('Tests Playwright') {
             steps {
                 bat 'npx playwright test'
