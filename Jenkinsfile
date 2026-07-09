@@ -11,7 +11,7 @@ pipeline {
 
         stage('Déploiement Apache') {
             steps {
-                bat 'xcopy * C:\\Apache24\\htdocs\\ /E /Y'
+                bat 'xcopy * C:\\Apache24\\htdocs\\Sokali\\ /E /Y'
             }
         }
 
@@ -21,7 +21,12 @@ pipeline {
             }
         }
 
-        
+        stage('Installation navigateur Playwright') {
+            steps {
+                bat 'npx playwright install chromium'
+            }
+        }
+
         stage('Tests Playwright') {
             steps {
                 bat 'npx playwright test'
@@ -30,12 +35,13 @@ pipeline {
     }
 
     post {
+
         always {
-            archiveArtifacts artifacts: 'playwright-report/**', fingerprint: true
+            archiveArtifacts artifacts: 'playwright-report/**', allowEmptyArchive: true
         }
 
         success {
-            echo 'Tous les tests sont passés.'
+            echo 'Tous les tests Playwright sont réussis.'
         }
 
         failure {
