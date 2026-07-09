@@ -15,5 +15,36 @@ pipeline {
             }
         }
 
+        stage('Installation des dépendances') {
+            steps {
+                bat 'npm install'
+            }
+        }
+
+        stage('Installation de Playwright') {
+            steps {
+                bat 'npx playwright install'
+            }
+        }
+
+        stage('Tests Playwright') {
+            steps {
+                bat 'npx playwright test'
+            }
+        }
+    }
+
+    post {
+        always {
+            archiveArtifacts artifacts: 'playwright-report/**', fingerprint: true
+        }
+
+        success {
+            echo 'Tous les tests sont passés.'
+        }
+
+        failure {
+            echo 'Au moins un test a échoué.'
+        }
     }
 }
