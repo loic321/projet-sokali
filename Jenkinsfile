@@ -14,10 +14,12 @@ pipeline {
                 echo 'Code recupere depuis GitHub'
                 
                 script {
-                    if (fileExists('index.html')) {
-                        echo 'index.html trouve a la racine du projet'
+                    if (fileExists('docs/index.html')) {
+                        echo 'index.html trouve dans docs/'
+                    } else if (fileExists('index.html')) {
+                        echo 'index.html trouve a la racine'
                     } else {
-                        error 'index.html manquant a la racine du projet'
+                        error 'index.html introuvable'
                     }
                 }
             }
@@ -78,32 +80,35 @@ pipeline {
         stage('Deploy to Apache') {
             steps {
                 script {
+                    def sourceDir = ''
+                    
+                    // Determiner la source
+                    if (fileExists('docs/index.html')) {
+                        sourceDir = 'docs'
+                        echo "Source: docs/"
+                    } else if (fileExists('index.html')) {
+                        sourceDir = '.'
+                        echo "Source: racine"
+                    } else {
+                        error 'Aucun index.html trouve'
+                    }
+                    
+                    // Nettoyer et deployer
                     bat """
                         echo "Nettoyage de l'ancien deploiement..."
                         if exist ${APACHE_DEPLOY} rmdir /s /q ${APACHE_DEPLOY}
                         mkdir ${APACHE_DEPLOY}
-                    """
-                    
-                    bat """
-                        echo "Copie des fichiers vers Apache..."
-                        copy *.html ${APACHE_DEPLOY}\\ 2>nul
-                        copy *.css ${APACHE_DEPLOY}\\ 2>nul
-                        copy *.js ${APACHE_DEPLOY}\\ 2>nul
-                        if exist assets xcopy /E /I /Y assets ${APACHE_DEPLOY}\\assets\\ 2>nul
-                        if exist images xcopy /E /I /Y images ${APACHE_DEPLOY}\\images\\ 2>nul
-                        if exist css xcopy /E /I /Y css ${APACHE_DEPLOY}\\css\\ 2>nul
-                        if exist js xcopy /E /I /Y js ${APACHE_DEPLOY}\\js\\ 2>nul
-                        if exist fonts xcopy /E /I /Y fonts ${APACHE_DEPLOY}\\fonts\\ 2>nul
+                        
+                        echo "Copie des fichiers depuis ${sourceDir}/ vers Apache..."
+                        xcopy /E /I /Y ${sourceDir}\\* ${APACHE_DEPLOY}\\
                         echo "Copie terminee"
                     """
                     
-                    script {
-                        if (fileExists('C:/Apache24/htdocs/Sokali/index.html')) {
-                            echo 'index.html deploye avec succes dans Apache'
-                            bat 'dir C:\\Apache24\\htdocs\\Sokali'
-                        } else {
-                            error 'Echec du deploiement - index.html manquant dans Apache'
-                        }
+                    // Verification
+                    if (fileExists('C:/Apache24/htdocs/Sokali/index.html')) {
+                        echo "Deploiement reussi - index.html present"
+                    } else {
+                        error "Deploiement echoue - index.html absent"
                     }
                 }
             }
