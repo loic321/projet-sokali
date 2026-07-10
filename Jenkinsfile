@@ -10,7 +10,6 @@ pipeline {
         stage('Récupération du code') {
             steps {
                 echo 'Code récupéré depuis GitHub'
-                // Exemple : git branch: 'main', url: 'https://github.com/tonrepo/Sokali.git'
             }
         }
 
@@ -47,7 +46,6 @@ pipeline {
         stage('Tests Playwright') {
             steps {
                 timeout(time: 10, unit: 'MINUTES') {
-                    // Le reporter HTML est défini dans playwright.config.ts
                     bat 'npx playwright test'
                 }
             }
@@ -56,20 +54,19 @@ pipeline {
 
     post {
         always {
-            // Archive du rapport Playwright
             archiveArtifacts(
                 artifacts: 'playwright-report/**',
                 allowEmptyArchive: true
             )
 
-            // Publication HTML dans Jenkins
             publishHTML([
                 allowMissing: false,
                 alwaysLinkToLastBuild: true,
                 keepAll: true,
                 reportDir: 'playwright-report',
                 reportFiles: 'index.html',
-                reportName: 'Rapport Playwright'
+                reportName: 'Rapport Playwright',
+                includes: '**/*'
             ])
         }
 
