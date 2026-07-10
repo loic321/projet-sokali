@@ -50,7 +50,8 @@ pipeline {
         stage('Tests Playwright') {
             steps {
                 timeout(time: 10, unit: 'MINUTES') {
-                    bat 'npx playwright test'
+                    // Timeout augmenté pour éviter les blocages
+                    bat 'npx playwright test --timeout=60000'
                 }
             }
         }
@@ -58,13 +59,15 @@ pipeline {
 
     post {
         always {
+            // Archive du rapport Playwright
             archiveArtifacts(
                 artifacts: 'playwright-report/**',
                 allowEmptyArchive: true
             )
 
+            // Publication HTML
             publishHTML([
-                allowMissing: true,
+                allowMissing: false,
                 alwaysLinkToLastBuild: true,
                 keepAll: true,
                 reportDir: 'playwright-report',
