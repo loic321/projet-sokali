@@ -12,12 +12,29 @@ pipeline {
                 checkout scm
                 echo '✅ Code récupéré'
                 
-                // Vérifier que index.html est à la racine du projet
                 script {
-                    if (fileExists('index.html')) {
-                        echo '✅ index.html trouvé à la racine du projet'
-                    } else {
-                        error '❌ index.html manquant à la racine du projet !'
+                    // Afficher la structure
+                    echo '=== STRUCTURE DU PROJET ==='
+                    bat 'dir /b'
+                    bat 'dir /b docs 2>nul || echo "Pas de dossier docs"'
+                    
+                    // Chercher index.html
+                    def found = false
+                    def locations = ['docs/index.html', 'public/index.html', 'src/index.html', 'index.html']
+                    
+                    for (loc in locations) {
+                        if (fileExists(loc)) {
+                            echo "✅ index.html trouvé dans ${loc}"
+                            found = true
+                            // Stocker le chemin pour l'utiliser plus tard
+                            env.INDEX_PATH = loc
+                            break
+                        }
+                    }
+                    
+                    if (!found) {
+                        bat 'dir /s *.html'
+                        error '❌ index.html introuvable ! Vérifiez la structure du projet.'
                     }
                 }
             }
@@ -49,7 +66,7 @@ pipeline {
             steps {
                 script {
                     if (fileExists('playwright-report/index.html')) {
-                        echo '✅ Rapport Playwright généré'
+                        echo '✅ Rapport généré'
                         
                         publishHTML([
                             allowMissing: false,
@@ -58,7 +75,7 @@ pipeline {
                             reportDir: 'playwright-report',
                             reportFiles: 'index.html',
                             reportName: 'Rapport Playwright',
-                            includes: '**/*'  // Inclut CSS, JS, images
+                            includes: '**/*'
                         ])
                         
                         archiveArtifacts(
@@ -75,75 +92,73 @@ pipeline {
         stage('Deploy to Apache') {
             steps {
                 script {
-                    // Nettoyer le dossier Apache
+                    def sourceDir = ''
+                    
+                    // Déterminer la source
+                    if (fileExists('docs/index.html')) {
+                        sourceDir = 'docs'
+                    } else if (fileExists('public/index.html')) {
+                        sourceDir = 'public'
+                    } else if (fileExists('src/index.html')) {
+                        sourceDir = 'src'
+                    } else if (fileExists('index.html')) {
+                        sourceDir = '.'
+                    } else {
+                        error '❌ Aucun index.html trouvé'
+                    }
+                    
+                    echo "📁 Source : ${sourceDir}"
+                    
+                    // Nettoyer Apache
                     bat """
                         if exist ${APACHE_DEPLOY} rmdir /s /q ${APACHE_DEPLOY}
                         mkdir ${APACHE_DEPLOY}
                     """
                     
-                    // Copier index.html à la racine
-                    bat "copy index.html ${APACHE_DEPLOY}\\"
-                    
-                    // Copier les dossiers nécessaires (css, js, etc.)
-                    // Adaptez selon votre structure
-                    def folders = ['css', 'js', 'assets', 'images']
-                    folders.each { folder ->
-                        if (fileExists(folder)) {
-                            bat "xcopy /E /I /Y ${folder} ${APACHE_DEPLOY}\\${folder}\\"
-                            echo "✅ ${folder} copié"
-                        }
+                    // Copier selon la source
+                    if (sourceDir == '.') {
+                        // Copier tous les fichiers sauf les dossiers inutiles
+                        bat """
+                            xcopy /E /I /Y * ${APACHE_DEPLOY}\\ /EXCLUDE:exclude.txt
+                        """
+                    } else {
+                        // Copier le contenu du dossier source
+                        bat "xcopy /E /I /Y ${sourceDir}\\* ${APACHE_DEPLOY}\\"
                     }
-                    
-                    // Alternative : copier tout sauf les dossiers inutiles
-                    /*
-                    bat """
-                        for /d %%i in (*) do (
-                            if not "%%i"=="tests" if not "%%i"=="node_modules" if not "%%i"=="playwright-report" if not "%%i"==".git" (
-                                xcopy /E /I /Y %%i ${APACHE_DEPLOY}\\%%i\\
-                            )
-                        )
-                    """
-                    */
                     
                     // Vérification finale
                     if (fileExists('C:/Apache24/htdocs/Sokali/index.html')) {
-                        echo '✅ Déploiement réussi - index.html présent'
+                        echo '✅ index.html présent dans Apache'
                     } else {
-                        error '❌ Déploiement échoué - index.html manquant'
+                        // Essayer de copier depuis la racine
+                        bat "copy index.html ${APACHE_DEPLOY}\\ 2>nul"
+                        if (fileExists('C:/Apache24/htdocs/Sokali/index.html')) {
+                            echo '✅ index.html copié depuis la racine'
+                        } else {
+                            error '❌ Déploiement échoué'
+                        }
                     }
                 }
             }
         }
         
-        // Vérifier l'accès au site
         stage('Verify Site') {
             steps {
                 script {
-                    def url = 'http://localhost/Sokali/'
-                    echo "🌐 Vérification : ${url}"
-                    
-                    // Option 1 : avec curl (si installé)
-                    try {
-                        def status = bat(script: "curl -s -o nul -w \"%{http_code}\" ${url}", returnStdout: true).trim()
-                        if (status == '200') {
-                            echo "✅ Site accessible (HTTP ${status})"
-                        } else {
-                            echo "⚠️ Site réponse : HTTP ${status}"
-                        }
-                    } catch (Exception e) {
-                        echo "⚠️ Impossible de vérifier : ${e.getMessage()}"
-                    }
-                    
-                    // Option 2 : avec PowerShell
+                    echo '🌐 Vérification du site...'
                     try {
                         bat """
                             powershell -Command "
-                                \$response = Invoke-WebRequest -Uri ${url} -UseBasicParsing
-                                Write-Host '✅ Site accessible - Status: ' \$response.StatusCode
+                                try {
+                                    \$response = Invoke-WebRequest -Uri http://localhost/Sokali/ -UseBasicParsing -TimeoutSec 5
+                                    Write-Host '✅ Site accessible - Status: ' \$response.StatusCode
+                                } catch {
+                                    Write-Host '⚠️ Site non accessible : ' \$_.Exception.Message
+                                }
                             "
                         """
                     } catch (Exception e) {
-                        echo "⚠️ Site non accessible"
+                        echo "⚠️ Vérification impossible : ${e.getMessage()}"
                     }
                 }
             }
@@ -175,50 +190,26 @@ pipeline {
                 try {
                     emailext(
                         to: EMAIL_TO,
-                        subject: "✅ Sokali Build #${env.BUILD_NUMBER} - SUCCESS",
+                        subject: "✅ Sokali #${env.BUILD_NUMBER} - SUCCESS",
                         body: """
                             <html>
-                                <head>
-                                    <style>
-                                        body { font-family: Arial, sans-serif; }
-                                        .success { color: #28a745; }
-                                        .info { background: #f8f9fa; padding: 15px; border-radius: 5px; }
-                                        .link { color: #007bff; text-decoration: none; }
-                                    </style>
-                                </head>
                                 <body>
-                                    <h2 class="success">✅ Build réussi !</h2>
-                                    
-                                    <div class="info">
-                                        <p><b>Projet :</b> Sokali</p>
-                                        <p><b>Build # :</b> ${env.BUILD_NUMBER}</p>
-                                        <p><b>Statut :</b> ✅ SUCCESS</p>
-                                        <p><b>URL :</b> <a href="${env.BUILD_URL}" class="link">${env.BUILD_URL}</a></p>
-                                        <p><b>Rapport :</b> <a href="${env.BUILD_URL}/Rapport_20Playwright/" class="link">Voir le rapport</a></p>
-                                    </div>
-                                    
+                                    <h2 style="color: #28a745;">✅ Build réussi !</h2>
+                                    <p><b>Projet :</b> Sokali</p>
+                                    <p><b>Build # :</b> ${env.BUILD_NUMBER}</p>
+                                    <p><b>URL :</b> <a href="${env.BUILD_URL}">${env.BUILD_URL}</a></p>
+                                    <p><b>Rapport :</b> <a href="${env.BUILD_URL}/Rapport_20Playwright/">Voir le rapport</a></p>
                                     <hr/>
-                                    
-                                    <p><b>🔗 Site déployé :</b></p>
-                                    <p><a href="http://localhost/Sokali/" class="link">http://localhost/Sokali/</a></p>
-                                    
+                                    <p><b>🌐 Site :</b> <a href="http://localhost/Sokali/">http://localhost/Sokali/</a></p>
                                     <p><b>📅 Date :</b> ${new Date().format('dd/MM/yyyy HH:mm:ss')}</p>
-                                    <p><b>⏱️ Durée :</b> ${currentBuild.durationString}</p>
-                                    
-                                    <hr/>
-                                    <p style="font-size:12px;color:#666;">
-                                        Cet email a été envoyé automatiquement par Jenkins.
-                                    </p>
                                 </body>
                             </html>
                         """,
                         mimeType: 'text/html'
                     )
-                    echo "✅ Email envoyé à ${EMAIL_TO}"
+                    echo "✅ Email envoyé"
                 } catch (Exception e) {
-                    echo "❌ Erreur envoi email : ${e.getMessage()}"
-                    // Afficher la stack trace
-                    e.printStackTrace()
+                    echo "❌ Erreur email : ${e.getMessage()}"
                 }
             }
         }
@@ -230,29 +221,19 @@ pipeline {
                 try {
                     emailext(
                         to: EMAIL_TO,
-                        subject: "❌ Sokali Build #${env.BUILD_NUMBER} - FAILED",
+                        subject: "❌ Sokali #${env.BUILD_NUMBER} - FAILED",
                         body: """
-                            <html>
-                                <body>
-                                    <h2 style="color: red;">❌ Build échoué</h2>
-                                    <p><b>Projet :</b> Sokali</p>
-                                    <p><b>Build # :</b> ${env.BUILD_NUMBER}</p>
-                                    <p><b>URL :</b> <a href="${env.BUILD_URL}">${env.BUILD_URL}</a></p>
-                                    <hr/>
-                                    <p><b>Erreurs possibles :</b></p>
-                                    <ul>
-                                        <li>❌ Tests Playwright échoués</li>
-                                        <li>❌ Déploiement Apache</li>
-                                        <li>❌ Dépendances manquantes</li>
-                                    </ul>
-                                    <p>📅 ${new Date().format('dd/MM/yyyy HH:mm:ss')}</p>
-                                </body>
-                            </html>
-                        """,
-                        mimeType: 'text/html'
+                            <h2 style="color: red;">❌ Build échoué</h2>
+                            <p><b>Build # :</b> ${env.BUILD_NUMBER}</p>
+                            <p><b>URL :</b> <a href="${env.BUILD_URL}">${env.BUILD_URL}</a></p>
+                            <p>Consultez les logs pour plus de détails.</p>
+                            <hr/>
+                            <p><b>Problème probable :</b> index.html introuvable</p>
+                            <p>Vérifiez que index.html est dans le projet et accessible.</p>
+                        """
                     )
                 } catch (Exception e) {
-                    echo "❌ Erreur email échec : ${e.getMessage()}"
+                    echo "❌ Erreur email : ${e.getMessage()}"
                 }
             }
         }
