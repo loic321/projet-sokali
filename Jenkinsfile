@@ -10,6 +10,7 @@ pipeline {
         stage('Récupération du code') {
             steps {
                 echo 'Code récupéré depuis GitHub'
+                // Exemple : git branch: 'main', url: 'https://github.com/tonrepo/Sokali.git'
             }
         }
 
@@ -46,7 +47,8 @@ pipeline {
         stage('Tests Playwright') {
             steps {
                 timeout(time: 10, unit: 'MINUTES') {
-                    bat 'npx playwright test --reporter=html --timeout=60000'
+                    // Le reporter HTML est défini dans playwright.config.ts
+                    bat 'npx playwright test'
                 }
             }
         }
@@ -54,11 +56,13 @@ pipeline {
 
     post {
         always {
+            // Archive du rapport Playwright
             archiveArtifacts(
                 artifacts: 'playwright-report/**',
                 allowEmptyArchive: true
             )
 
+            // Publication HTML dans Jenkins
             publishHTML([
                 allowMissing: false,
                 alwaysLinkToLastBuild: true,
@@ -73,7 +77,18 @@ pipeline {
             echo 'Pipeline terminé avec succès'
             emailext(
                 subject: 'Sokali CI/CD - Tests réussis',
-                body: 'Bonjour,\n\nLe pipeline Jenkins du projet Sokali est terminé avec succès.\n\nRapport disponible dans Jenkins.\n\nCordialement.',
+                body: '''
+Bonjour,
+
+Le pipeline Jenkins du projet Sokali est terminé avec succès.
+
+Résultats :
+- Déploiement Apache : OK
+- Tests Playwright : OK
+- Rapport disponible dans Jenkins.
+
+Cordialement.
+''',
                 to: 'christianloic321@gmail.com'
             )
         }
@@ -82,7 +97,15 @@ pipeline {
             echo 'Pipeline échoué'
             emailext(
                 subject: 'Sokali CI/CD - Échec du pipeline',
-                body: 'Bonjour,\n\nLe pipeline Jenkins du projet Sokali a échoué.\n\nVeuillez consulter Jenkins pour voir les erreurs et le rapport Playwright.\n\nCordialement.',
+                body: '''
+Bonjour,
+
+Le pipeline Jenkins du projet Sokali a échoué.
+
+Veuillez consulter Jenkins pour voir les erreurs et le rapport Playwright.
+
+Cordialement.
+''',
                 to: 'christianloic321@gmail.com'
             )
         }
