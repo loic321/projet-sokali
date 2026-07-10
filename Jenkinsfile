@@ -11,9 +11,9 @@ pipeline {
         stage('Récupération du code') {
             steps {
                 echo 'Code récupéré depuis GitHub'
+                // Exemple : git branch: 'main', url: 'https://github.com/tonrepo/Sokali.git'
             }
         }
-
 
         stage('Installation des dépendances') {
             steps {
@@ -21,55 +21,47 @@ pipeline {
             }
         }
 
-
         stage('Installation navigateur Playwright') {
             steps {
                 bat 'npx playwright install chromium'
             }
         }
 
-
         stage('Sauvegarde ancienne version') {
             steps {
-                bat '''
-                if exist C:\\Backup\\Sokali (
-                    rmdir /S /Q C:\\Backup\\Sokali
+                bat """
+                if exist %BACKUP_PATH% (
+                    rmdir /S /Q %BACKUP_PATH%
                 )
-
-                mkdir C:\\Backup\\Sokali
-
-                xcopy C:\\Apache24\\htdocs\\Sokali C:\\Backup\\Sokali /E /Y
-                '''
+                mkdir %BACKUP_PATH%
+                xcopy %APACHE_PATH% %BACKUP_PATH% /E /Y
+                """
             }
         }
-
 
         stage('Déploiement Apache') {
             steps {
-                bat '''
-                xcopy * C:\\Apache24\\htdocs\\Sokali /E /Y
-                '''
+                bat """
+                xcopy * %APACHE_PATH% /E /Y
+                """
             }
         }
 
-
         stage('Tests Playwright') {
             steps {
-                bat 'npx playwright test'
+                timeout(time: 10, unit: 'MINUTES') {
+                    bat 'npx playwright test'
+                }
             }
         }
     }
 
-
     post {
-
         always {
-
             archiveArtifacts(
                 artifacts: 'playwright-report/**',
                 allowEmptyArchive: true
             )
-
 
             publishHTML([
                 allowMissing: true,
@@ -81,9 +73,7 @@ pipeline {
             ])
         }
 
-
         success {
-
             echo 'Pipeline terminé avec succès'
 
             emailext(
@@ -104,9 +94,7 @@ Cordialement.
             )
         }
 
-
         failure {
-
             echo 'Pipeline échoué'
 
             emailext(
