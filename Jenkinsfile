@@ -1,5 +1,5 @@
 pipeline {
-    /*agent any
+    agent any
     
     environment {
         EMAIL_TO = 'christianloic321@gmail.com'
@@ -267,38 +267,6 @@ pipeline {
                 }
             }
         }
-    } */
-
-    agent any
-
-    stages {
-               stage('Checkout') {
-            steps {
-                checkout scm
-                echo 'Code recupere depuis GitHub'
-                
-                script {
-                    if (fileExists('docs/index.html')) {
-                        echo 'index.html trouve dans docs/'
-                    } else if (fileExists('index.html')) {
-                        echo 'index.html trouve a la racine'
-                    } else {
-                        error 'index.html introuvable'
-                    }
-                }
-            }
-        }
-    }
-
-    post {
-        always {
-            emailtext (
-                subject: "Test de verification",
-                body: "Bonjour c'est ok"
-                to: 'christianloic321@gmail.com'
-            )
-        }
-    }
-
+    } 
 
 }
