@@ -3,29 +3,37 @@ pipeline {
     
     environment {
         EMAIL_TO = 'christianloic321@gmail.com'
-        APACHE_DIR = 'C:\\Apache24\\htdocs\\sokali'
-        BUILD_STATUS = ''
+        APACHE_DEPLOY = 'C:\\Apache24\\htdocs\\Sokali'
     }
     
     stages {
         stage('Checkout') {
             steps {
                 checkout scm
-                echo '✅ Code récupéré depuis GitHub'
+                echo '✅ Code récupéré'
+                
+                // Vérifier que index.html est à la racine du projet
+                script {
+                    if (fileExists('index.html')) {
+                        echo '✅ index.html trouvé à la racine du projet'
+                    } else {
+                        error '❌ index.html manquant à la racine du projet !'
+                    }
+                }
             }
         }
         
         stage('Install Dependencies') {
             steps {
                 bat 'npm install'
-                echo '✅ Dépendances npm installées'
+                echo '✅ Dépendances installées'
             }
         }
         
         stage('Install Browsers') {
             steps {
                 bat 'npx playwright install'
-                echo '✅ Navigateurs Playwright installés'
+                echo '✅ Navigateurs installés'
             }
         }
         
@@ -37,7 +45,7 @@ pipeline {
             }
         }
         
-        stage('Generate Report') {
+        stage('Publish Report') {
             steps {
                 script {
                     if (fileExists('playwright-report/index.html')) {
@@ -50,16 +58,15 @@ pipeline {
                             reportDir: 'playwright-report',
                             reportFiles: 'index.html',
                             reportName: 'Rapport Playwright',
-                            includes: '**/*'  // Inclut CSS/JS/images
+                            includes: '**/*'  // Inclut CSS, JS, images
                         ])
                         
                         archiveArtifacts(
                             artifacts: 'playwright-report/**',
-                            allowEmptyArchive: true,
-                            fingerprint: true
+                            allowEmptyArchive: false
                         )
                     } else {
-                        echo '⚠️ Aucun rapport Playwright trouvé'
+                        echo '⚠️ Rapport manquant'
                     }
                 }
             }
@@ -68,60 +75,75 @@ pipeline {
         stage('Deploy to Apache') {
             steps {
                 script {
-                    // Nettoyer l'ancien déploiement
+                    // Nettoyer le dossier Apache
                     bat """
-                        if exist ${APACHE_DIR} rmdir /s /q ${APACHE_DIR}
-                        mkdir ${APACHE_DIR}
+                        if exist ${APACHE_DEPLOY} rmdir /s /q ${APACHE_DEPLOY}
+                        mkdir ${APACHE_DEPLOY}
                     """
                     
-                    // Copier les fichiers nécessaires
-                    // Option 1 : Copier uniquement les fichiers sources et HTML
+                    // Copier index.html à la racine
+                    bat "copy index.html ${APACHE_DEPLOY}\\"
+                    
+                    // Copier les dossiers nécessaires (css, js, etc.)
+                    // Adaptez selon votre structure
+                    def folders = ['css', 'js', 'assets', 'images']
+                    folders.each { folder ->
+                        if (fileExists(folder)) {
+                            bat "xcopy /E /I /Y ${folder} ${APACHE_DEPLOY}\\${folder}\\"
+                            echo "✅ ${folder} copié"
+                        }
+                    }
+                    
+                    // Alternative : copier tout sauf les dossiers inutiles
+                    /*
                     bat """
-                        xcopy /E /I /Y src\\* ${APACHE_DIR}\\ 2>nul
-                        xcopy /E /I /Y *.html ${APACHE_DIR}\\ 2>nul
-                        xcopy /E /I /Y *.css ${APACHE_DIR}\\ 2>nul
-                        xcopy /E /I /Y *.js ${APACHE_DIR}\\ 2>nul
+                        for /d %%i in (*) do (
+                            if not "%%i"=="tests" if not "%%i"=="node_modules" if not "%%i"=="playwright-report" if not "%%i"==".git" (
+                                xcopy /E /I /Y %%i ${APACHE_DEPLOY}\\%%i\\
+                            )
+                        )
                     """
+                    */
                     
-                    // Option 2 (alternative) : Copier tout en excluant les dossiers de test
-                    // Créez un fichier exclude.txt dans la racine du projet avec :
-                    // node_modules\
-                    // playwright-report\
-                    // test-results\
-                    // .git\
-                    // Jenkinsfile
-                    // *.md
-                    // package.json
-                    // package-lock.json
-                    // bat "xcopy /E /I /Y * ${APACHE_DIR}\\ /EXCLUDE:exclude.txt"
-                    
-                    echo '✅ Déploiement vers Apache effectué'
+                    // Vérification finale
+                    if (fileExists('C:/Apache24/htdocs/Sokali/index.html')) {
+                        echo '✅ Déploiement réussi - index.html présent'
+                    } else {
+                        error '❌ Déploiement échoué - index.html manquant'
+                    }
                 }
             }
         }
         
-        stage('Test Email Configuration') {
+        // Vérifier l'accès au site
+        stage('Verify Site') {
             steps {
                 script {
-                    echo '=== TEST DE CONFIGURATION EMAIL ==='
+                    def url = 'http://localhost/Sokali/'
+                    echo "🌐 Vérification : ${url}"
                     
-                    // Test d'envoi d'email avec logs
+                    // Option 1 : avec curl (si installé)
                     try {
-                        emailext(
-                            to: EMAIL_TO,
-                            subject: "TEST - Sokali Jenkins Configuration",
-                            body: """
-                                <h2>Test de configuration email</h2>
-                                <p><b>Job :</b> ${env.JOB_NAME}</p>
-                                <p><b>Build :</b> ${env.BUILD_NUMBER}</p>
-                                <p><b>Date :</b> ${new Date()}</p>
-                                <p>✅ La configuration SMTP fonctionne correctement.</p>
-                            """
-                        )
-                        echo '✅ Email de test envoyé avec succès'
+                        def status = bat(script: "curl -s -o nul -w \"%{http_code}\" ${url}", returnStdout: true).trim()
+                        if (status == '200') {
+                            echo "✅ Site accessible (HTTP ${status})"
+                        } else {
+                            echo "⚠️ Site réponse : HTTP ${status}"
+                        }
                     } catch (Exception e) {
-                        echo "❌ Erreur lors de l'envoi du test : ${e.getMessage()}"
-                        e.printStackTrace()
+                        echo "⚠️ Impossible de vérifier : ${e.getMessage()}"
+                    }
+                    
+                    // Option 2 : avec PowerShell
+                    try {
+                        bat """
+                            powershell -Command "
+                                \$response = Invoke-WebRequest -Uri ${url} -UseBasicParsing
+                                Write-Host '✅ Site accessible - Status: ' \$response.StatusCode
+                            "
+                        """
+                    } catch (Exception e) {
+                        echo "⚠️ Site non accessible"
                     }
                 }
             }
@@ -131,7 +153,6 @@ pipeline {
     post {
         always {
             script {
-                // Nettoyage du workspace avec gestion d'erreur
                 try {
                     sleep time: 2, unit: 'SECONDS'
                     cleanWs(
@@ -141,20 +162,17 @@ pipeline {
                         deleteDirs: true
                     )
                 } catch (Exception e) {
-                    echo "⚠️ Erreur lors du nettoyage : ${e.getMessage()}"
-                    // Ignorer l'erreur pour ne pas faire échouer le pipeline
+                    echo "⚠️ Erreur nettoyage : ${e.getMessage()}"
                 }
             }
-            echo '🧹 Nettoyage du workspace terminé'
+            echo '🧹 Nettoyage terminé'
         }
         
         success {
             script {
-                echo '🎉 Pipeline terminé avec SUCCÈS'
-                currentBuild.result = 'SUCCESS'
+                echo '🎉 Pipeline SUCCÈS'
                 
                 try {
-                    // Envoyer l'email de succès
                     emailext(
                         to: EMAIL_TO,
                         subject: "✅ Sokali Build #${env.BUILD_NUMBER} - SUCCESS",
@@ -162,43 +180,44 @@ pipeline {
                             <html>
                                 <head>
                                     <style>
-                                        body { font-family: Arial, sans-serif; color: #333; }
-                                        h2 { color: #28a745; }
-                                        .info { background: #f8f9fa; padding: 10px; border-radius: 5px; margin: 10px 0; }
-                                        .success { color: #28a745; font-weight: bold; }
-                                        .footer { margin-top: 20px; font-size: 12px; color: #6c757d; }
+                                        body { font-family: Arial, sans-serif; }
+                                        .success { color: #28a745; }
+                                        .info { background: #f8f9fa; padding: 15px; border-radius: 5px; }
+                                        .link { color: #007bff; text-decoration: none; }
                                     </style>
                                 </head>
                                 <body>
-                                    <h2>✅ Build réussi !</h2>
+                                    <h2 class="success">✅ Build réussi !</h2>
+                                    
                                     <div class="info">
                                         <p><b>Projet :</b> Sokali</p>
                                         <p><b>Build # :</b> ${env.BUILD_NUMBER}</p>
-                                        <p><b>Statut :</b> <span class="success">✅ SUCCESS</span></p>
-                                        <p><b>URL du build :</b> <a href="${env.BUILD_URL}">${env.BUILD_URL}</a></p>
-                                        <p><b>Rapport Playwright :</b> <a href="${env.BUILD_URL}/Rapport_20Playwright/">Voir le rapport complet</a></p>
+                                        <p><b>Statut :</b> ✅ SUCCESS</p>
+                                        <p><b>URL :</b> <a href="${env.BUILD_URL}" class="link">${env.BUILD_URL}</a></p>
+                                        <p><b>Rapport :</b> <a href="${env.BUILD_URL}/Rapport_20Playwright/" class="link">Voir le rapport</a></p>
                                     </div>
+                                    
                                     <hr/>
-                                    <p><b>Résultats :</b></p>
-                                    <ul>
-                                        <li>✅ Tests Playwright : réussis</li>
-                                        <li>✅ Déploiement Apache : effectué</li>
-                                        <li>✅ Rapport généré et archivé</li>
-                                    </ul>
-                                    <p><b>Date :</b> ${new Date().format('dd/MM/yyyy HH:mm:ss')}</p>
-                                    <p><b>Durée :</b> ${currentBuild.durationString}</p>
-                                    <div class="footer">
-                                        <p>Cet email a été envoyé automatiquement par Jenkins CI/CD.</p>
-                                    </div>
+                                    
+                                    <p><b>🔗 Site déployé :</b></p>
+                                    <p><a href="http://localhost/Sokali/" class="link">http://localhost/Sokali/</a></p>
+                                    
+                                    <p><b>📅 Date :</b> ${new Date().format('dd/MM/yyyy HH:mm:ss')}</p>
+                                    <p><b>⏱️ Durée :</b> ${currentBuild.durationString}</p>
+                                    
+                                    <hr/>
+                                    <p style="font-size:12px;color:#666;">
+                                        Cet email a été envoyé automatiquement par Jenkins.
+                                    </p>
                                 </body>
                             </html>
                         """,
                         mimeType: 'text/html'
                     )
-                    echo '✅ Email de succès envoyé avec succès'
-                    
+                    echo "✅ Email envoyé à ${EMAIL_TO}"
                 } catch (Exception e) {
-                    echo "❌ ERREUR lors de l'envoi de l'email : ${e.getMessage()}"
+                    echo "❌ Erreur envoi email : ${e.getMessage()}"
+                    // Afficher la stack trace
                     e.printStackTrace()
                 }
             }
@@ -206,81 +225,34 @@ pipeline {
         
         failure {
             script {
-                echo '❌ Pipeline terminé en ÉCHEC'
-                currentBuild.result = 'FAILURE'
+                echo '❌ Pipeline ÉCHEC'
                 
                 try {
-                    // Envoyer l'email d'échec
                     emailext(
                         to: EMAIL_TO,
                         subject: "❌ Sokali Build #${env.BUILD_NUMBER} - FAILED",
                         body: """
                             <html>
-                                <head>
-                                    <style>
-                                        body { font-family: Arial, sans-serif; color: #333; }
-                                        h2 { color: #dc3545; }
-                                        .error { background: #f8d7da; padding: 10px; border-radius: 5px; margin: 10px 0; }
-                                        .footer { margin-top: 20px; font-size: 12px; color: #6c757d; }
-                                    </style>
-                                </head>
                                 <body>
-                                    <h2 style="color: #dc3545;">❌ Build échoué</h2>
-                                    <div class="error">
-                                        <p><b>Projet :</b> Sokali</p>
-                                        <p><b>Build # :</b> ${env.BUILD_NUMBER}</p>
-                                        <p><b>Statut :</b> ❌ FAILED</p>
-                                        <p><b>URL du build :</b> <a href="${env.BUILD_URL}">${env.BUILD_URL}</a></p>
-                                    </div>
+                                    <h2 style="color: red;">❌ Build échoué</h2>
+                                    <p><b>Projet :</b> Sokali</p>
+                                    <p><b>Build # :</b> ${env.BUILD_NUMBER}</p>
+                                    <p><b>URL :</b> <a href="${env.BUILD_URL}">${env.BUILD_URL}</a></p>
                                     <hr/>
                                     <p><b>Erreurs possibles :</b></p>
                                     <ul>
                                         <li>❌ Tests Playwright échoués</li>
-                                        <li>❌ Problème de déploiement Apache</li>
-                                        <li>❌ Erreur de compilation ou de dépendances</li>
+                                        <li>❌ Déploiement Apache</li>
+                                        <li>❌ Dépendances manquantes</li>
                                     </ul>
-                                    <p><b>Date :</b> ${new Date().format('dd/MM/yyyy HH:mm:ss')}</p>
-                                    <p><b>Pour résoudre :</b></p>
-                                    <ol>
-                                        <li>Consultez les logs Jenkins</li>
-                                        <li>Vérifiez le rapport Playwright</li>
-                                        <li>Corrigez les erreurs et repoussez</li>
-                                    </ol>
-                                    <div class="footer">
-                                        <p>Cet email a été envoyé automatiquement par Jenkins CI/CD.</p>
-                                    </div>
+                                    <p>📅 ${new Date().format('dd/MM/yyyy HH:mm:ss')}</p>
                                 </body>
                             </html>
                         """,
                         mimeType: 'text/html'
                     )
-                    echo '✅ Email d\'échec envoyé'
-                    
                 } catch (Exception e) {
-                    echo "❌ ERREUR lors de l'envoi de l'email d'échec : ${e.getMessage()}"
-                    e.printStackTrace()
-                }
-            }
-        }
-        
-        aborted {
-            script {
-                echo '⚠️ Pipeline annulé'
-                
-                try {
-                    emailext(
-                        to: EMAIL_TO,
-                        subject: "⚠️ Sokali Build #${env.BUILD_NUMBER} - ABORTED",
-                        body: """
-                            <h2 style="color: #ffc107;">⚠️ Build annulé</h2>
-                            <p><b>Projet :</b> Sokali</p>
-                            <p><b>Build # :</b> ${env.BUILD_NUMBER}</p>
-                            <p><b>Date :</b> ${new Date().format('dd/MM/yyyy HH:mm:ss')}</p>
-                            <p>Le build a été annulé manuellement.</p>
-                        """
-                    )
-                } catch (Exception e) {
-                    echo "❌ Erreur email d'annulation : ${e.getMessage()}"
+                    echo "❌ Erreur email échec : ${e.getMessage()}"
                 }
             }
         }
