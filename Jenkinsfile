@@ -1,109 +1,121 @@
 pipeline {
     agent any
-
+    
     environment {
-        APACHE_PATH = 'C:\\Apache24\\htdocs\\Sokali'
-        BACKUP_PATH = 'C:\\Backup\\Sokali'
+        EMAIL_TO = 'christianloic321@gmail.com'
+        PLAYWRIGHT_REPORT_DIR = 'playwright-report'
     }
-
+    
     stages {
-        stage('Récupération du code') {
+        stage('Checkout') {
             steps {
-                echo 'Code récupéré depuis GitHub'
+                checkout scm
+                echo '✅ Code récupéré'
             }
         }
-
-        stage('Installation des dépendances') {
+        
+        stage('Install Dependencies') {
             steps {
                 bat 'npm install'
+                echo '✅ Dépendances installées'
             }
         }
-
-        stage('Installation navigateur Playwright') {
+        
+        stage('Install Browsers') {
             steps {
-                bat 'npx playwright install chromium'
+                bat 'npx playwright install'
+                echo '✅ Navigateurs installés'
             }
         }
-
-        stage('Sauvegarde ancienne version') {
+        
+        stage('Run Tests') {
             steps {
-                bat """
-                if exist %BACKUP_PATH% (
-                    rmdir /S /Q %BACKUP_PATH%
-                )
-                mkdir %BACKUP_PATH%
-                xcopy %APACHE_PATH% %BACKUP_PATH% /E /Y
-                """
-            }
-        }
-
-        stage('Déploiement Apache') {
-            steps {
-                bat "xcopy * %APACHE_PATH% /E /Y"
-            }
-        }
-
-        stage('Tests Playwright') {
-            steps {
-                timeout(time: 10, unit: 'MINUTES') {
+                catchError(buildResult: 'FAILURE', stageResult: 'FAILURE') {
                     bat 'npx playwright test'
                 }
             }
         }
+        
+        stage('Publish Report') {
+            steps {
+                script {
+                    // Vérifier que le rapport existe
+                    if (fileExists('playwright-report/index.html')) {
+                        echo '✅ Rapport Playwright trouvé'
+                        
+                        publishHTML([
+                            allowMissing: false,
+                            alwaysLinkToLastBuild: true,
+                            keepAll: true,
+                            reportDir: 'playwright-report',
+                            reportFiles: 'index.html',
+                            reportName: 'Rapport Playwright',
+                            includes: '**/*'  // Inclut CSS/JS
+                        ])
+                        
+                        archiveArtifacts(
+                            artifacts: 'playwright-report/**',
+                            allowEmptyArchive: true
+                        )
+                    } else {
+                        echo '⚠️ Aucun rapport Playwright trouvé'
+                    }
+                }
+            }
+        }
+        
+        stage('Deploy to Apache') {
+            steps {
+                script {
+                    // Supprimer les anciens fichiers
+                    bat 'if exist C:\\Apache24\\htdocs\\sokali rmdir /s /q C:\\Apache24\\htdocs\\sokali'
+                    
+                    // Créer le dossier
+                    bat 'mkdir C:\\Apache24\\htdocs\\sokali'
+                    
+                    // Copier les fichiers (exclure les dossiers de test)
+                    bat 'xcopy /E /I /Y * C:\\Apache24\\htdocs\\sokali\\ /EXCLUDE:exclude.txt'
+                }
+                echo '✅ Déploiement Apache terminé'
+            }
+        }
     }
-
+    
     post {
         always {
-            archiveArtifacts(
-                artifacts: 'playwright-report/**',
-                allowEmptyArchive: true
-            )
-
-            publishHTML([
-                allowMissing: false,
-                alwaysLinkToLastBuild: true,
-                keepAll: true,
-                reportDir: 'playwright-report',
-                reportFiles: 'index.html',
-                reportName: 'Rapport Playwright',
-                includes: '**/*'
-            ])
+            cleanWs()
+            echo '🧹 Workspace nettoyé'
         }
-
+        
         success {
-            echo 'Pipeline terminé avec succès'
+            echo '🎉 Pipeline terminé avec succès'
+            
             emailext(
-                subject: 'Sokali CI/CD - Tests réussis',
-                body: '''
-Bonjour,
-
-Le pipeline Jenkins du projet Sokali est terminé avec succès.
-
-Résultats :
-- Déploiement Apache : OK
-- Tests Playwright : OK
-- Rapport disponible dans Jenkins.
-
-Cordialement.
-''',
-                to: 'christianloic321@gmail.com'
+                subject: "✅ Sokali #${env.BUILD_NUMBER} - SUCCESS",
+                body: """
+                    <h2>✅ Build réussi</h2>
+                    <p><b>Projet :</b> Sokali</p>
+                    <p><b>Build # :</b> ${env.BUILD_NUMBER}</p>
+                    <p><b>URL :</b> <a href="${env.BUILD_URL}">${env.BUILD_URL}</a></p>
+                    <p><b>Rapport :</b> <a href="${env.BUILD_URL}/Rapport_20Playwright/">Voir le rapport</a></p>
+                    <hr/>
+                    <p>Déploiement effectué sur Apache.</p>
+                """,
+                to: EMAIL_TO
             )
         }
-
+        
         failure {
-            echo 'Pipeline échoué'
             emailext(
-                subject: 'Sokali CI/CD - Échec du pipeline',
-                body: '''
-Bonjour,
-
-Le pipeline Jenkins du projet Sokali a échoué.
-
-Veuillez consulter Jenkins pour voir les erreurs et le rapport Playwright.
-
-Cordialement.
-''',
-                to: 'christianloic321@gmail.com'
+                subject: "❌ Sokali #${env.BUILD_NUMBER} - FAILED",
+                body: """
+                    <h2 style="color: red;">❌ Build échoué</h2>
+                    <p><b>Projet :</b> Sokali</p>
+                    <p><b>Build # :</b> ${env.BUILD_NUMBER}</p>
+                    <p><b>URL :</b> <a href="${env.BUILD_URL}">${env.BUILD_URL}</a></p>
+                    <p>Veuillez consulter les logs pour identifier l'erreur.</p>
+                """,
+                to: EMAIL_TO
             )
         }
     }
