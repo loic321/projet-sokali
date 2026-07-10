@@ -7,11 +7,9 @@ pipeline {
     }
 
     stages {
-
         stage('Récupération du code') {
             steps {
                 echo 'Code récupéré depuis GitHub'
-                // Exemple : git branch: 'main', url: 'https://github.com/tonrepo/Sokali.git'
             }
         }
 
@@ -41,17 +39,14 @@ pipeline {
 
         stage('Déploiement Apache') {
             steps {
-                bat """
-                xcopy * %APACHE_PATH% /E /Y
-                """
+                bat "xcopy * %APACHE_PATH% /E /Y"
             }
         }
 
         stage('Tests Playwright') {
             steps {
                 timeout(time: 10, unit: 'MINUTES') {
-                    // Timeout augmenté pour éviter les blocages
-                    bat 'npx playwright test --timeout=60000'
+                    bat 'npx playwright test --reporter=html --timeout=60000'
                 }
             }
         }
@@ -59,13 +54,11 @@ pipeline {
 
     post {
         always {
-            // Archive du rapport Playwright
             archiveArtifacts(
                 artifacts: 'playwright-report/**',
                 allowEmptyArchive: true
             )
 
-            // Publication HTML
             publishHTML([
                 allowMissing: false,
                 alwaysLinkToLastBuild: true,
@@ -78,39 +71,18 @@ pipeline {
 
         success {
             echo 'Pipeline terminé avec succès'
-
             emailext(
                 subject: 'Sokali CI/CD - Tests réussis',
-                body: '''
-Bonjour,
-
-Le pipeline Jenkins du projet Sokali est terminé avec succès.
-
-Résultats :
-- Déploiement Apache : OK
-- Tests Playwright : OK
-- Rapport disponible dans Jenkins.
-
-Cordialement.
-''',
-                to: 'tonmail@gmail.com'
+                body: 'Bonjour,\n\nLe pipeline Jenkins du projet Sokali est terminé avec succès.\n\nRapport disponible dans Jenkins.\n\nCordialement.',
+                to: 'christianloic321@gmail.com'
             )
         }
 
         failure {
             echo 'Pipeline échoué'
-
             emailext(
                 subject: 'Sokali CI/CD - Échec du pipeline',
-                body: '''
-Bonjour,
-
-Le pipeline Jenkins du projet Sokali a échoué.
-
-Veuillez consulter Jenkins pour voir les erreurs et le rapport Playwright.
-
-Cordialement.
-''',
+                body: 'Bonjour,\n\nLe pipeline Jenkins du projet Sokali a échoué.\n\nVeuillez consulter Jenkins pour voir les erreurs et le rapport Playwright.\n\nCordialement.',
                 to: 'christianloic321@gmail.com'
             )
         }
