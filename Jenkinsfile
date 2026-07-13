@@ -1,6 +1,11 @@
 pipeline {
     agent any
     
+    options {
+    timeout(time: 20, unit: 'MINUTES')
+    timestamps()
+}
+    
     environment {
         EMAIL_TO = 'christianloic321@gmail.com'
         APACHE_DEPLOY = 'C:\\Apache24\\htdocs\\Sokali'
