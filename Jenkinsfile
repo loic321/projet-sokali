@@ -1,15 +1,9 @@
 pipeline {
     agent any
     
-    options {
-    timeout(time: 20, unit: 'MINUTES')
-    timestamps()
-}
-    
     environment {
         EMAIL_TO = 'christianloic321@gmail.com'
         APACHE_DEPLOY = 'C:\\Apache24\\htdocs\\Sokali'
-        BUILD_STATUS = ''
     }
     
     stages {
@@ -85,20 +79,8 @@ pipeline {
         stage('Deploy to Apache') {
             steps {
                 script {
-                    def sourceDir = ''
+                    def sourceDir = fileExists('docs/index.html') ? 'docs' : '.'
                     
-                    // Determiner la source
-                    if (fileExists('docs/index.html')) {
-                        sourceDir = 'docs'
-                        echo "Source: docs/"
-                    } else if (fileExists('index.html')) {
-                        sourceDir = '.'
-                        echo "Source: racine"
-                    } else {
-                        error 'Aucun index.html trouve'
-                    }
-                    
-                    // Nettoyer et deployer
                     bat """
                         echo "Nettoyage de l'ancien deploiement..."
                         if exist ${APACHE_DEPLOY} rmdir /s /q ${APACHE_DEPLOY}
@@ -109,11 +91,10 @@ pipeline {
                         echo "Copie terminee"
                     """
                     
-                    // Verification
                     if (fileExists('C:/Apache24/htdocs/Sokali/index.html')) {
-                        echo "Deploiement reussi - index.html present"
+                        echo 'Deploiement reussi - index.html present'
                     } else {
-                        error "Deploiement echoue - index.html absent"
+                        error 'Deploiement echoue - index.html absent'
                     }
                 }
             }
@@ -123,28 +104,23 @@ pipeline {
             steps {
                 script {
                     echo 'Verification du deploiement...'
+                    
+                    // Vérifier Apache
                     try {
                         def result = bat(
-                            script: '''
-                                powershell -Command "
-                                    try {
-                                        $response = Invoke-WebRequest -Uri 'http://localhost/Sokali/' -UseBasicParsing -TimeoutSec 5
-                                        Write-Host 'SUCCESS:' $response.StatusCode
-                                    } catch {
-                                        Write-Host 'ERROR:' $_.Exception.Message
-                                    }
-                                "
-                            ''',
+                            script: 'curl -s -o nul -w "%{http_code}" http://localhost/Sokali/',
                             returnStdout: true
                         ).trim()
                         
-                        if (result.contains('SUCCESS')) {
-                            echo "Site accessible : ${result}"
+                        if (result == '200') {
+                            echo "Site accessible (HTTP ${result})"
                         } else {
-                            echo "Site non accessible : ${result}"
+                            echo "Site repond HTTP ${result}"
+                            // Ne pas faire échouer le pipeline
                         }
                     } catch (Exception e) {
-                        echo "Verification impossible : ${e.getMessage()}"
+                        echo "Apache ne repond pas : ${e.getMessage()}"
+                        echo "Verifiez qu'Apache est demarre sur localhost:80"
                     }
                 }
             }
@@ -163,7 +139,7 @@ pipeline {
                         deleteDirs: true
                     )
                 } catch (Exception e) {
-                    echo "Erreur lors du nettoyage : ${e.getMessage()}"
+                    echo "Erreur nettoyage : ${e.getMessage()}"
                 }
             }
             echo 'Nettoyage du workspace termine'
@@ -172,7 +148,6 @@ pipeline {
         success {
             script {
                 echo 'Pipeline termine avec SUCCES'
-                currentBuild.result = 'SUCCESS'
                 
                 try {
                     emailext(
@@ -180,30 +155,18 @@ pipeline {
                         subject: "Sokali Build ${env.BUILD_NUMBER} - SUCCESS",
                         body: """
                             Build reussi
-            
+
                             Projet: Sokali
                             Build: ${env.BUILD_NUMBER}
-                            Statut: SUCCESS
                             URL: ${env.BUILD_URL}
-                            Rapport Playwright: ${env.BUILD_URL}/Rapport_20Playwright/
-                            
-                            Resultats:
-                            - Tests Playwright: reussis
-                            - Deploiement Apache: effectue
-                            - Rapport genere et archive
-                            
+                            Rapport: ${env.BUILD_URL}/Rapport_20Playwright/
                             Site: http://localhost/Sokali/
                             Date: ${new Date().format('dd/MM/yyyy HH:mm:ss')}
-                            Duree: ${currentBuild.durationString}
-                            
-                            Cet email a ete envoye automatiquement par Jenkins CI/CD.
                         """
                     )
-                    echo "Email de succes envoye a ${EMAIL_TO}"
-                    
+                    echo "Email de succes envoye"
                 } catch (Exception e) {
-                    echo "ERREUR lors de l'envoi de l'email : ${e.getMessage()}"
-                    e.printStackTrace()
+                    echo "Erreur email : ${e.getMessage()}"
                 }
             }
         }
@@ -211,7 +174,6 @@ pipeline {
         failure {
             script {
                 echo 'Pipeline termine en ECHEC'
-                currentBuild.result = 'FAILURE'
                 
                 try {
                     emailext(
@@ -219,59 +181,21 @@ pipeline {
                         subject: "Sokali Build ${env.BUILD_NUMBER} - FAILED",
                         body: """
                             Build echoue
-            
+
                             Projet: Sokali
                             Build: ${env.BUILD_NUMBER}
-                            Statut: FAILED
                             URL: ${env.BUILD_URL}
-                            
-                            Erreurs possibles:
-                            - Tests Playwright echoues
-                            - Probleme de deploiement Apache
-                            - Erreur de compilation ou de dependances
-                            
                             Date: ${new Date().format('dd/MM/yyyy HH:mm:ss')}
                             
-                            Pour resoudre:
-                            1. Consultez les logs Jenkins
-                            2. Verifiez le rapport Playwright
-                            3. Corrigez les erreurs et repoussez
-                            
-                            Cet email a ete envoye automatiquement par Jenkins CI/CD.
+                            Verifiez que Apache est demarre sur localhost:80
+                            Et que le site est accessible sur http://localhost/Sokali/
                         """
                     )
                     echo "Email d'echec envoye"
-                    
                 } catch (Exception e) {
-                    echo "ERREUR lors de l'envoi de l'email d'echec : ${e.getMessage()}"
-                    e.printStackTrace()
+                    echo "Erreur email : ${e.getMessage()}"
                 }
             }
         }
-        
-        aborted {
-            script {
-                echo 'Pipeline annule'
-                
-                try {
-                    emailext(
-                        to: EMAIL_TO,
-                        subject: "Sokali Build ${env.BUILD_NUMBER} - ABORTED",
-                        body: """
-                            Build annule
-            
-                            Projet: Sokali
-                            Build: ${env.BUILD_NUMBER}
-                            Date: ${new Date().format('dd/MM/yyyy HH:mm:ss')}
-                            
-                            Le build a ete annule manuellement.
-                        """
-                    )
-                } catch (Exception e) {
-                    echo "Erreur email d'annulation : ${e.getMessage()}"
-                }
-            }
-        }
-    } 
-
+    }
 }
