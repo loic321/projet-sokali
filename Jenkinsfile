@@ -148,50 +148,50 @@ pipeline {
         success {
             script {
                 echo 'Pipeline termine avec SUCCES'
-                
-                try {
-                    emailext(
-                        to: EMAIL_TO,
-                        subject: "Sokali Build ${env.BUILD_NUMBER} - SUCCESS",
-                        body: """
-                            Build reussi
 
-                            Projet: Sokali
-                            Build: ${env.BUILD_NUMBER}
-                            URL: ${env.BUILD_URL}
-                            Rapport: ${env.BUILD_URL}/Rapport_20Playwright/
-                            Site: http://localhost/Sokali/
-                            Date: ${new Date().format('dd/MM/yyyy HH:mm:ss')}
-                        """
+                try {
+                    mail(
+                        to: EMAIL_TO,
+                        from: 'christianloic321@gmail.com',
+                        subject: "Pipeline terminé avec SUCCÈS",
+                        body: """Le build Jenkins s'est exécuté correctement.
+
+        Projet : Sokali
+        Build : ${env.BUILD_NUMBER}
+        URL : ${env.BUILD_URL}
+        Site : http://localhost/Sokali/
+        Date : ${new Date().format('dd/MM/yyyy HH:mm:ss')}
+        """
                     )
-                    echo "Email de succes envoye"
+
+                    echo 'Email de succes envoye'
                 } catch (Exception e) {
                     echo "Erreur email : ${e.getMessage()}"
                 }
             }
         }
-        
+                
         failure {
             script {
                 echo 'Pipeline termine en ECHEC'
-                
-                try {
-                    emailext(
-                        to: EMAIL_TO,
-                        subject: "Sokali Build ${env.BUILD_NUMBER} - FAILED",
-                        body: """
-                            Build echoue
 
-                            Projet: Sokali
-                            Build: ${env.BUILD_NUMBER}
-                            URL: ${env.BUILD_URL}
-                            Date: ${new Date().format('dd/MM/yyyy HH:mm:ss')}
-                            
-                            Verifiez que Apache est demarre sur localhost:80
-                            Et que le site est accessible sur http://localhost/Sokali/
-                        """
+                try {
+                    mail(
+                        to: EMAIL_TO,
+                        from: 'christianloic321@gmail.com',
+                        subject: "Pipeline terminé en ÉCHEC",
+                        body: """Le build Jenkins a échoué.
+
+        Projet : Sokali
+        Build : ${env.BUILD_NUMBER}
+        URL : ${env.BUILD_URL}
+        Date : ${new Date().format('dd/MM/yyyy HH:mm:ss')}
+
+        Vérifiez les logs Jenkins pour connaître la cause de l'échec.
+        """
                     )
-                    echo "Email d'echec envoye"
+
+                    echo 'Email d echec envoye'
                 } catch (Exception e) {
                     echo "Erreur email : ${e.getMessage()}"
                 }
