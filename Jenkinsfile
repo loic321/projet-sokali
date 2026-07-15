@@ -39,15 +39,17 @@ pipeline {
         }
         
         stage('Run Tests') {
-            steps {
-                catchError(buildResult: 'FAILURE', stageResult: 'FAILURE') {
-                    bat 'npx playwright test'
-                    echo "Tests Playwright terminés."
+                steps {
 
-                    bat 'dir playwright-report'
+                    echo 'Lancement des tests Playwright...'
+
+                    bat 'npx playwright test'
+
+                    echo 'Tests Playwright réussis'
+
                 }
-            }
-        }
+
+}
         
        stage('Publish Report') {
 
