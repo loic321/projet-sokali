@@ -73,15 +73,15 @@ pipeline {
                             echo "Rapport Playwright trouvé."
 
                             publishHTML([
-                                allowMissing: false,
-                                alwaysLinkToLastBuild: true,
-                                keepAll: true,
-                                reportDir: 'playwright-report',
-                                reportFiles: 'index.html',
-                                reportName: 'Rapport Playwright',
-                                includes: '**/*'
-                            ])
-
+                                    allowMissing: false,
+                                    alwaysLinkToLastBuild: true,
+                                    keepAll: true,
+                                    reportDir: 'playwright-report',
+                                    reportFiles: 'index.html',
+                                    reportName: 'Rapport Playwright',
+                                    includes: '**/*',
+                                    escapeUnderscores: false
+                                ])
                             archiveArtifacts(
                                 artifacts: 'playwright-report/**',
                                 fingerprint: true
@@ -195,19 +195,9 @@ pipeline {
     
     post {
         always {
-            script {
-                try {
-                    sleep time: 2, unit: 'SECONDS'
-                    cleanWs(
-                        deleteDirs: true,
-                        disableDeferredWipeout: true,
-                        cleanWhenFailure: true
-                    )
-                } catch (Exception e) {
-                    echo "Erreur nettoyage : ${e.getMessage()}"
-                }
-            }
-            echo 'Nettoyage du workspace termine'
+
+            echo "Fin du pipeline"
+
         }
         
        success {
