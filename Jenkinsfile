@@ -102,31 +102,35 @@ pipeline {
                 }
             }
         }
-        
         stage('Verify Deployment') {
             steps {
                 script {
                     echo 'Verification du deploiement...'
-                    
-                    // Vérifier Apache
+
                     try {
+
+                        echo "Test de l'URL : http://localhost/Sokali/"
+
+                        // Affiche le contenu renvoyé par Apache
+                        bat 'curl http://localhost/Sokali/'
+
+                        // Récupère le code HTTP
                         def result = bat(
-                            echo "Test de l'URL : http://localhost/Sokali/"
-bat 'curl http://localhost/Sokali/'
-                           script: 'curl -s -o nul -w "%%{http_code}" http://localhost/Sokali/',
+                            script: 'curl -s -o nul -w "%%{http_code}" http://localhost/Sokali/',
                             returnStdout: true
-                            echo "Résultat curl : ${result}"
                         ).trim()
-                        
-                        if (result == '200') {
-                            echo "Site accessible (HTTP ${result})"
+
+                        echo "Résultat curl : ${result}"
+
+                        if (result.contains('200')) {
+                            echo "Site accessible (HTTP 200)"
                         } else {
-                            echo "Site repond HTTP ${result}"
-                            // Ne pas faire échouer le pipeline
+                            echo "Site répond : ${result}"
                         }
+
                     } catch (Exception e) {
-                        echo "Apache ne repond pas : ${e.getMessage()}"
-                        echo "Verifiez qu'Apache est demarre sur localhost:80"
+                        echo "Apache ne répond pas : ${e.getMessage()}"
+                        echo "Vérifiez qu'Apache est démarré sur localhost:80"
                     }
                 }
             }

@@ -43,7 +43,7 @@ test.describe('Page Sokali', () => {
 
     await page.goto('http://localhost/Sokali/');
 
-    await page.waitForLoadState('networkidle');
+   await page.waitForLoadState('domcontentloaded');
 
     // Recherche
     const search = page.locator('input[type="search"], input[type="text"]').first();
