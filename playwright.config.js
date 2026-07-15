@@ -47,13 +47,12 @@ export default defineConfig({
 
 
   // Lance automatiquement un serveur sur le workspace Jenkins
-  webServer: {
-    command: 'npx http-server . -p 3000',
-    url: 'http://127.0.0.1:3000',
-    reuseExistingServer: false,
-    timeout: 120000
-  },
-
+ webServer: {
+  command: 'npx http-server Sokali -p 3000',
+  url: 'http://127.0.0.1:3000',
+  reuseExistingServer: false,
+  timeout: 120000
+},
 
   projects: [
 
