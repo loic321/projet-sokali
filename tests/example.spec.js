@@ -5,7 +5,7 @@ test.describe('Page Sokali', () => {
 
   test('Chargement et contenu statique', async ({ page }) => {
 
-    await page.goto('http://localhost/Sokali/');
+    await page.goto('/');
 
     // Attendre le chargement du DOM
     await page.waitForLoadState('domcontentloaded');
@@ -101,7 +101,7 @@ test.describe('Page Sokali', () => {
   test('Interactions simples', async ({ page }) => {
 
 
-    await page.goto('http://localhost/Sokali/');
+    await page.goto('/');
 
 
     await page.waitForLoadState('domcontentloaded');
@@ -146,7 +146,7 @@ test.describe('Page Sokali', () => {
   test('Vérification de la structure HTML du Body', async ({ page }) => {
 
 
-    await page.goto('http://localhost/Sokali/');
+   await page.goto('/');
 
 
     await page.waitForLoadState('domcontentloaded');

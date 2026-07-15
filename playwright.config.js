@@ -16,7 +16,7 @@ export default defineConfig({
   // Timeout maximum d'un test
   timeout: 60000,
 
-  // Génération automatique du rapport HTML
+
   reporter: [
     [
       'html',
@@ -26,7 +26,6 @@ export default defineConfig({
       }
     ],
 
-    // Rapport lisible dans la console Jenkins
     [
       'list'
     ]
@@ -35,18 +34,24 @@ export default defineConfig({
 
   use: {
 
-    // URL de base de ton application
-    baseURL: 'http://localhost/Sokali/',
+    // Playwright testera le code récupéré par Jenkins
+    baseURL: 'http://127.0.0.1:3000/',
 
-    // Capture une trace si le test échoue
     trace: 'retain-on-failure',
 
-    // Capture écran en cas d'erreur
     screenshot: 'only-on-failure',
 
-    // Enregistre une vidéo uniquement si le test échoue
     video: 'retain-on-failure',
 
+  },
+
+
+  // Lance automatiquement un serveur sur le workspace Jenkins
+  webServer: {
+    command: 'npx http-server . -p 3000',
+    url: 'http://127.0.0.1:3000',
+    reuseExistingServer: false,
+    timeout: 120000
   },
 
 
@@ -64,7 +69,6 @@ export default defineConfig({
   ],
 
 
-  // Dossier où Playwright stocke les résultats temporaires
   outputDir: 'test-results',
 
 });
