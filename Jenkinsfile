@@ -72,16 +72,16 @@ pipeline {
 
                             echo "Rapport Playwright trouvé."
 
-                            publishHTML([
-                                    allowMissing: false,
-                                    alwaysLinkToLastBuild: true,
-                                    keepAll: true,
-                                    reportDir: 'playwright-report',
-                                    reportFiles: 'index.html',
-                                    reportName: 'Rapport Playwright',
-                                    includes: '**/*',
-                                    escapeUnderscores: false
-                                ])
+                           publishHTML([
+                                allowMissing: false,
+                                alwaysLinkToLastBuild: true,
+                                keepAll: true,
+                                reportDir: 'playwright-report',
+                                reportFiles: 'index.html',
+                                reportName: 'Rapport Playwright',
+                                includes: '**/*',
+                                useWrapperFileDirectly: true
+                            ])
                             archiveArtifacts(
                                 artifacts: 'playwright-report/**',
                                 fingerprint: true
