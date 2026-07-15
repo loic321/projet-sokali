@@ -7,7 +7,7 @@ test.describe('Page Sokali', () => {
     await page.goto('http://localhost/Sokali/');
 
     // attendre que la page soit chargée
-    await page.waitForLoadState('networkidle');
+   await page.waitForLoadState('domcontentloaded');
 
     // Vérification du titre
     await expect(page).toHaveTitle(/SOKALI/i);

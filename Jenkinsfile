@@ -42,6 +42,9 @@ pipeline {
             steps {
                 catchError(buildResult: 'FAILURE', stageResult: 'FAILURE') {
                     bat 'npx playwright test'
+                    echo "Tests Playwright terminés."
+
+                    bat 'dir playwright-report'
                 }
             }
         }
@@ -108,8 +111,11 @@ pipeline {
                     // Vérifier Apache
                     try {
                         def result = bat(
-                            script: 'curl -s -o nul -w "%{http_code}" http://localhost/Sokali/',
+                            echo "Test de l'URL : http://localhost/Sokali/"
+bat 'curl http://localhost/Sokali/'
+                           script: 'curl -s -o nul -w "%%{http_code}" http://localhost/Sokali/',
                             returnStdout: true
+                            echo "Résultat curl : ${result}"
                         ).trim()
                         
                         if (result == '200') {
@@ -133,10 +139,9 @@ pipeline {
                 try {
                     sleep time: 2, unit: 'SECONDS'
                     cleanWs(
-                        cleanWhenAborted: true,
-                        cleanWhenFailure: true,
-                        cleanWhenNotBuilt: true,
-                        deleteDirs: true
+                        deleteDirs: true,
+                        disableDeferredWipeout: true,
+                        cleanWhenFailure: true
                     )
                 } catch (Exception e) {
                     echo "Erreur nettoyage : ${e.getMessage()}"
@@ -145,16 +150,22 @@ pipeline {
             echo 'Nettoyage du workspace termine'
         }
         
-        success {
+       success {
             script {
-                echo 'Pipeline termine avec SUCCES'
+
+                echo 'Pipeline terminé avec SUCCÈS'
+
+                echo "Destinataire : ${EMAIL_TO}"
+                echo "Début de l'envoi de l'e-mail..."
 
                 try {
+
                     mail(
                         to: EMAIL_TO,
                         from: 'christianloic321@gmail.com',
                         subject: "Pipeline terminé avec SUCCÈS",
-                        body: """Le build Jenkins s'est exécuté correctement.
+                        body: """
+        Le build Jenkins s'est exécuté correctement.
 
         Projet : Sokali
         Build : ${env.BUILD_NUMBER}
@@ -164,37 +175,58 @@ pipeline {
         """
                     )
 
-                    echo 'Email de succes envoye'
-                } catch (Exception e) {
-                    echo "Erreur email : ${e.getMessage()}"
+                    echo "mail() s'est terminé sans exception."
+
+                } catch(Exception e) {
+
+                    echo "ERREUR pendant mail()"
+
+                    echo e.toString()
+
+                    e.printStackTrace()
+
                 }
+
             }
         }
                 
         failure {
             script {
-                echo 'Pipeline termine en ECHEC'
+
+                echo 'Pipeline terminé en ÉCHEC'
+
+                echo "Destinataire : ${EMAIL_TO}"
+                echo "Début de l'envoi de l'e-mail..."
 
                 try {
+
                     mail(
                         to: EMAIL_TO,
                         from: 'christianloic321@gmail.com',
                         subject: "Pipeline terminé en ÉCHEC",
-                        body: """Le build Jenkins a échoué.
+                        body: """
+        Le build Jenkins a échoué.
 
         Projet : Sokali
         Build : ${env.BUILD_NUMBER}
         URL : ${env.BUILD_URL}
-        Date : ${new Date().format('dd/MM/yyyy HH:mm:ss')}
 
-        Vérifiez les logs Jenkins pour connaître la cause de l'échec.
+        Consultez les logs Jenkins.
         """
                     )
 
-                    echo 'Email d echec envoye'
-                } catch (Exception e) {
-                    echo "Erreur email : ${e.getMessage()}"
+                    echo "mail() s'est terminé sans exception."
+
+                } catch(Exception e){
+
+                    echo "ERREUR pendant mail()"
+
+                    echo e.toString()
+
+                    e.printStackTrace()
+
                 }
+
             }
         }
     }
