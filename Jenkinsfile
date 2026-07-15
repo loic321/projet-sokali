@@ -37,31 +37,40 @@ pipeline {
                 echo 'Navigateurs Playwright installes'
             }
         }
-
         
-        
-        stage('Run Tests') {
-                steps {
 
-                    echo 'Lancement des tests Playwright...'
-
-                    bat 'npx playwright test'
-
-                    echo 'Tests Playwright réussis'
-
-                }
-
-}
-        
-       stage('Publish Report') {
+       stage('Run Tests') {
 
                 steps {
 
                     script {
 
-                        if(fileExists('playwright-report/index.html')) {
+                        echo 'Lancement des tests Playwright...'
 
-                            echo "Rapport Playwright trouvé"
+                        catchError(buildResult: 'FAILURE', stageResult: 'FAILURE') {
+
+                            bat 'npx playwright test'
+
+                        }
+
+                        echo "Tests terminés."
+                        echo "Résultat actuel : ${currentBuild.currentResult}"
+
+                    }
+
+                }
+
+            }
+
+         stage('Publish Report') {
+
+                steps {
+
+                    script {
+
+                        if (fileExists('playwright-report/index.html')) {
+
+                            echo "Rapport Playwright trouvé."
 
                             publishHTML([
                                 allowMissing: false,
@@ -73,83 +82,115 @@ pipeline {
                                 includes: '**/*'
                             ])
 
+                            archiveArtifacts(
+                                artifacts: 'playwright-report/**',
+                                fingerprint: true
+                            )
+
+                            echo "Rapport publié avec succès."
+
                         } else {
 
-                            error "Rapport Playwright absent"
+                            echo "Aucun rapport Playwright trouvé."
 
                         }
 
                     }
 
                 }
-        }
 
-        stage('Deploy to Apache') {
-            steps {
-                script {
-                    def sourceDir = fileExists('docs/index.html') ? 'docs' : '.'
-                    
-                    bat """
-                        echo "Nettoyage de l'ancien deploiement..."
-                        if exist ${APACHE_DEPLOY} rmdir /s /q ${APACHE_DEPLOY}
-                        mkdir ${APACHE_DEPLOY}
-                        
-                        echo "Copie des fichiers depuis ${sourceDir}/ vers Apache..."
-                        xcopy /E /I /Y ${sourceDir}\\* ${APACHE_DEPLOY}\\
-                        echo "Copie terminee"
-                    """
-                    
-                    if (fileExists('C:/Apache24/htdocs/Sokali/index.html')) {
-                        echo 'Deploiement reussi - index.html present'
-                    } else {
-                        error 'Deploiement echoue - index.html absent'
-                    }
-                }
             }
-        }
-        
-        stage('Verify Deployment') {
+
+       stage('Compress Playwright Report') {
+
             steps {
-                script {
-                    echo 'Verification du deploiement...'
 
-                    try {
-
-                        echo "Test de l'URL : http://localhost/Sokali/"
-
-                        // Affiche le contenu renvoyé par Apache
-                        bat 'curl http://localhost/Sokali/'
-
-                        // Récupère le code HTTP
-                        def result = bat(
-                            script: 'curl -s -o nul -w "%%{http_code}" http://localhost/Sokali/',
-                            returnStdout: true
-                        ).trim()
-
-                        echo "Résultat curl : ${result}"
-
-                        if (result.contains('200')) {
-                            echo "Site accessible (HTTP 200)"
-                        } else {
-                            echo "Site répond : ${result}"
-                        }
-
-                    } catch (Exception e) {
-                        echo "Apache ne répond pas : ${e.getMessage()}"
-                        echo "Vérifiez qu'Apache est démarré sur localhost:80"
-                    }
-                }
-            }
-        }
-        stage('Compress Playwright Report') {
-            steps {
                 bat '''
                 if exist playwright-report (
                     powershell Compress-Archive -Path playwright-report -DestinationPath playwright-report.zip -Force
                 )
                 '''
+
+                archiveArtifacts(
+                    artifacts: 'playwright-report.zip',
+                    fingerprint: true
+                )
+
             }
+
         }
+        
+
+        stage('Deploy to Apache') {
+
+                when {
+
+                    expression {
+
+                        currentBuild.currentResult == 'SUCCESS'
+
+                    }
+
+                }
+
+                steps {
+
+                    script {
+
+                        def sourceDir = fileExists('docs/index.html') ? 'docs' : '.'
+
+                        bat """
+                            echo Nettoyage...
+                            if exist ${APACHE_DEPLOY} rmdir /s /q ${APACHE_DEPLOY}
+                            mkdir ${APACHE_DEPLOY}
+
+                            echo Copie...
+                            xcopy /E /I /Y ${sourceDir}\\* ${APACHE_DEPLOY}\\
+                        """
+
+                        if (fileExists('C:/Apache24/htdocs/Sokali/index.html')) {
+
+                            echo 'Déploiement réussi.'
+
+                        } else {
+
+                            error 'Déploiement échoué.'
+
+                        }
+
+                    }
+
+                }
+
+            }
+        
+       stage('Verify Deployment') {
+
+            when {
+                expression {
+                    currentBuild.currentResult == null || currentBuild.currentResult == 'SUCCESS'
+                }
+            }
+
+            steps {
+
+                script {
+
+                    echo "Vérification du déploiement..."
+
+                    def result = bat(
+                        script: 'curl -s -o nul -w "%%{http_code}" http://localhost/Sokali/',
+                        returnStdout: true
+                    ).trim()
+
+                    echo "HTTP : ${result}"
+
+                }
+
+            }
+
+        }
+        
     }
     
     post {
