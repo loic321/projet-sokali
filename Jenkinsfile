@@ -165,221 +165,205 @@ pipeline {
         }
         
        success {
-    script {
+                script {
 
-        echo 'Pipeline terminé avec SUCCÈS'
+                    echo 'Pipeline terminé avec SUCCÈS'
 
-        echo "Destinataire : ${EMAIL_TO}"
-        echo "Préparation de l'email HTML..."
+                    echo "Destinataire : ${EMAIL_TO}"
+                    echo "Préparation de l'envoi de l'email..."
 
-        try {
+                    try {
 
-            emailext(
-                                to: EMAIL_TO,
+                        emailext(
+                            to: EMAIL_TO,
 
-                                subject: "✅ Sokali Build ${env.BUILD_NUMBER} - SUCCESS",
+                            subject: "Sokali Build ${env.BUILD_NUMBER} - SUCCESS",
 
-                                mimeType: 'text/html',
+                            mimeType: 'text/html',
 
-                                body: """
-                                <html>
-                                <body>
+                            body: """
+            <html>
+            <body>
 
-                                <h2>Pipeline Sokali terminé avec succès</h2>
+            <h2>Pipeline Sokali terminé avec succès</h2>
 
-                                <p>Bonjour,</p>
-
-                                <p>
-                                Le pipeline Jenkins s'est exécuté correctement.
-                                </p>
-
-                                <table border="1" cellpadding="8">
-
-                                    <tr>
-                                        <td><b>Projet</b></td>
-                                        <td>Sokali</td>
-                                    </tr>
-
-                                    <tr>
-                                        <td><b>Build</b></td>
-                                        <td>${env.BUILD_NUMBER}</td>
-                                    </tr>
-
-                                    <tr>
-                                        <td><b>Date</b></td>
-                                        <td>${new Date().format('dd/MM/yyyy HH:mm:ss')}</td>
-                                    </tr>
-
-                                </table>
+            <p>
+            Le pipeline Jenkins s'est exécuté correctement.
+            </p>
 
 
-                                <h3>Liens Jenkins</h3>
+            <table border="1" cellpadding="8" cellspacing="0">
 
-                                <p>
-                                📊 Rapport Playwright :
-                                <br>
-                                <a href="${env.BUILD_URL}Rapport_Playwright/">
-                                Ouvrir le rapport des tests
-                                </a>
-                                </p>
+            <tr>
+            <td>Projet</td>
+            <td>Sokali</td>
+            </tr>
 
+            <tr>
+            <td>Build</td>
+            <td>${env.BUILD_NUMBER}</td>
+            </tr>
 
-                                <p>
-                                ⚙️ Build Jenkins :
-                                <br>
-                                <a href="${env.BUILD_URL}">
-                                Voir les détails du build
-                                </a>
-                                </p>
+            <tr>
+            <td>Date</td>
+            <td>${new Date().format('dd/MM/yyyy HH:mm:ss')}</td>
+            </tr>
 
-
-                                <p>
-                                🌐 Site Sokali :
-                                <br>
-                                <a href="http://localhost/Sokali/">
-                                Ouvrir le site
-                                </a>
-                                </p>
+            </table>
 
 
-                                <br>
+            <p>
+            Rapport Playwright :
+            <br>
 
-                                <p>
-                                Cordialement,<br>
-                                Jenkins CI/CD
-                                </p>
+            <a href="${env.BUILD_URL}Rapport_20Playwright/">
+            Ouvrir le rapport des tests
+            </a>
 
-                                </body>
-                                </html>
-                                """,
-
-                                attachmentsPattern: 'playwright-report.zip'
-
-                            )
+            </p>
 
 
-                            echo "Email SUCCESS envoyé avec succès"
+            <p>
+            Build Jenkins :
+            <br>
 
-                        } catch(Exception e) {
+            <a href="${env.BUILD_URL}">
+            Voir les détails du build
+            </a>
 
-                            echo "Erreur envoi email SUCCESS : ${e.getMessage()}"
+            </p>
 
-                        }
+
+            <p>
+            Site Sokali :
+            <br>
+
+            <a href="http://localhost/Sokali/">
+            Accéder au site
+            </a>
+
+            </p>
+
+
+            <p>
+            Cordialement,
+            <br>
+            Jenkins CI/CD
+            </p>
+
+
+            </body>
+            </html>
+            """
+                        )
+
+
+                        echo "Email SUCCESS envoyé avec succès"
+
+
+                    } catch(Exception e) {
+
+                        echo "Erreur pendant l'envoi de l'email SUCCESS : ${e.getMessage()}"
 
                     }
-                }
-                            
-        failure {
-    script {
-
-        echo 'Pipeline terminé en ÉCHEC'
-
-        echo "Destinataire : ${EMAIL_TO}"
-        echo "Préparation de l'email HTML..."
-
-        try {
-
-            emailext(
-
-                        to: EMAIL_TO,
-
-                        subject: "❌ Sokali Build ${env.BUILD_NUMBER} - FAILURE",
-
-                        mimeType: 'text/html',
-
-                        body: """
-
-                        <html>
-                        <body>
-
-
-                        <h2>Pipeline Sokali en échec</h2>
-
-
-                        <p>Bonjour,</p>
-
-
-                        <p>
-                        Le pipeline Jenkins a rencontré une erreur.
-                        </p>
-
-
-                        <table border="1" cellpadding="8">
-
-                            <tr>
-                                <td><b>Projet</b></td>
-                                <td>Sokali</td>
-                            </tr>
-
-                            <tr>
-                                <td><b>Build</b></td>
-                                <td>${env.BUILD_NUMBER}</td>
-                            </tr>
-
-                            <tr>
-                                <td><b>Date</b></td>
-                                <td>${new Date().format('dd/MM/yyyy HH:mm:ss')}</td>
-                            </tr>
-
-                        </table>
-
-
-                        <h3>Informations de debug</h3>
-
-
-                        <p>
-                        Rapport Playwright :
-                        <br>
-
-                        <a href="${env.BUILD_URL}Rapport_Playwright/">
-                        Ouvrir le rapport des tests
-                        </a>
-
-                        </p>
-
-
-                        <p>
-                        Logs Jenkins :
-                        <br>
-
-                        <a href="${env.BUILD_URL}console">
-                        Voir la console Jenkins
-                        </a>
-
-                        </p>
-
-
-                        <br>
-
-
-                        <p>
-                        Cordialement,<br>
-                        Jenkins CI/CD
-                        </p>
-
-
-                        </body>
-                        </html>
-
-                        """,
-
-                        attachmentsPattern: 'playwright-report.zip'
-
-                    )
-
-
-                    echo "Email FAILURE envoyé avec succès"
-
-
-                } catch(Exception e) {
-
-
-                    echo "Erreur envoi email FAILURE : ${e.getMessage()}"
-
 
                 }
-
             }
-        }
+                            
+           failure {
+                script {
+
+                    echo 'Pipeline terminé en ÉCHEC'
+
+                    echo "Destinataire : ${EMAIL_TO}"
+                    echo "Préparation de l'envoi de l'email..."
+
+                    try {
+
+                        emailext(
+                            to: EMAIL_TO,
+
+                            subject: "Sokali Build ${env.BUILD_NUMBER} - FAILURE",
+
+                            mimeType: 'text/html',
+
+                            body: """
+            <html>
+            <body>
+
+            <h2>Pipeline Sokali échoué</h2>
+
+            <p>
+            Le pipeline Jenkins n'a pas pu terminer correctement.
+            </p>
+
+
+            <table border="1" cellpadding="8" cellspacing="0">
+
+            <tr>
+            <td>Projet</td>
+            <td>Sokali</td>
+            </tr>
+
+            <tr>
+            <td>Build</td>
+            <td>${env.BUILD_NUMBER}</td>
+            </tr>
+
+            <tr>
+            <td>Date</td>
+            <td>${new Date().format('dd/MM/yyyy HH:mm:ss')}</td>
+            </tr>
+
+            </table>
+
+
+            <p>
+            Rapport Playwright :
+            <br>
+
+            <a href="${env.BUILD_URL}Rapport_20Playwright/">
+            Ouvrir le rapport des tests
+            </a>
+
+            </p>
+
+
+            <p>
+            Console Jenkins :
+            <br>
+
+            <a href="${env.BUILD_URL}console">
+            Voir les logs d'exécution
+            </a>
+
+            </p>
+
+
+            <p>
+            Cordialement,
+            <br>
+            Jenkins CI/CD
+            </p>
+
+
+            </body>
+            </html>
+            """
+
+                        )
+
+
+                   echo "Email FAILURE envoyé avec succès"
+
+
+                 } catch(Exception e) {
+
+                    echo "Erreur pendant l'envoi de l'email FAILURE : ${e.getMessage()}"
+
+                   }
+
+             }
+         }
     }
 }
