@@ -136,6 +136,15 @@ pipeline {
                 }
             }
         }
+        stage('Compress Playwright Report') {
+            steps {
+                bat '''
+                if exist playwright-report (
+                    powershell Compress-Archive -Path playwright-report -DestinationPath playwright-report.zip -Force
+                )
+                '''
+            }
+        }
     }
     
     post {
@@ -156,117 +165,221 @@ pipeline {
         }
         
        success {
-                script {
+    script {
 
-                    echo 'Pipeline terminé avec SUCCÈS'
+        echo 'Pipeline terminé avec SUCCÈS'
 
-                    echo "Destinataire : ${EMAIL_TO}"
-                    echo "Préparation de l'envoi du rapport Playwright..."
+        echo "Destinataire : ${EMAIL_TO}"
+        echo "Préparation de l'email HTML..."
 
-                    try {
+        try {
 
-                        emailext(
-                            to: EMAIL_TO,
+            emailext(
+                                to: EMAIL_TO,
 
-                            subject: "Sokali Build ${env.BUILD_NUMBER} - SUCCESS",
+                                subject: "✅ Sokali Build ${env.BUILD_NUMBER} - SUCCESS",
 
-                            body: """
-            Bonjour,
+                                mimeType: 'text/html',
 
-            Le pipeline Jenkins s'est exécuté correctement.
+                                body: """
+                                <html>
+                                <body>
 
-            Projet : Sokali
-            Build : ${env.BUILD_NUMBER}
+                                <h2>Pipeline Sokali terminé avec succès</h2>
 
-            URL Jenkins :
-            ${env.BUILD_URL}
+                                <p>Bonjour,</p>
 
-            Site :
-            http://localhost/Sokali/
+                                <p>
+                                Le pipeline Jenkins s'est exécuté correctement.
+                                </p>
 
-            Rapport Playwright :
-            ${env.BUILD_URL}Rapport_Playwright/
+                                <table border="1" cellpadding="8">
 
-            Date :
-            ${new Date().format('dd/MM/yyyy HH:mm:ss')}
+                                    <tr>
+                                        <td><b>Projet</b></td>
+                                        <td>Sokali</td>
+                                    </tr>
 
-            Cordialement,
-            Jenkins
-            """,
+                                    <tr>
+                                        <td><b>Build</b></td>
+                                        <td>${env.BUILD_NUMBER}</td>
+                                    </tr>
 
-                            attachmentsPattern: 'playwright-report.zip',
+                                    <tr>
+                                        <td><b>Date</b></td>
+                                        <td>${new Date().format('dd/MM/yyyy HH:mm:ss')}</td>
+                                    </tr>
 
-                            mimeType: 'text/html'
-                        )
+                                </table>
 
-                        echo "Email de succès envoyé avec rapport Playwright."
 
-                    } catch(Exception e) {
+                                <h3>Liens Jenkins</h3>
 
-                        echo "Erreur pendant l'envoi de l'email : ${e.getMessage()}"
+                                <p>
+                                📊 Rapport Playwright :
+                                <br>
+                                <a href="${env.BUILD_URL}Rapport_Playwright/">
+                                Ouvrir le rapport des tests
+                                </a>
+                                </p>
+
+
+                                <p>
+                                ⚙️ Build Jenkins :
+                                <br>
+                                <a href="${env.BUILD_URL}">
+                                Voir les détails du build
+                                </a>
+                                </p>
+
+
+                                <p>
+                                🌐 Site Sokali :
+                                <br>
+                                <a href="http://localhost/Sokali/">
+                                Ouvrir le site
+                                </a>
+                                </p>
+
+
+                                <br>
+
+                                <p>
+                                Cordialement,<br>
+                                Jenkins CI/CD
+                                </p>
+
+                                </body>
+                                </html>
+                                """,
+
+                                attachmentsPattern: 'playwright-report.zip'
+
+                            )
+
+
+                            echo "Email SUCCESS envoyé avec succès"
+
+                        } catch(Exception e) {
+
+                            echo "Erreur envoi email SUCCESS : ${e.getMessage()}"
+
+                        }
 
                     }
-
                 }
-            }
                             
         failure {
-                script {
+    script {
 
-                    echo 'Pipeline terminé en ÉCHEC'
+        echo 'Pipeline terminé en ÉCHEC'
 
-                    echo "Destinataire : ${EMAIL_TO}"
-                    echo "Préparation de l'envoi du rapport Playwright..."
+        echo "Destinataire : ${EMAIL_TO}"
+        echo "Préparation de l'email HTML..."
 
-                    try {
+        try {
 
-                        emailext(
-                            to: EMAIL_TO,
+            emailext(
 
-                            subject: "Sokali Build ${env.BUILD_NUMBER} - FAILURE",
+                        to: EMAIL_TO,
 
-                            body: """
-            Bonjour,
+                        subject: "❌ Sokali Build ${env.BUILD_NUMBER} - FAILURE",
 
-            Le pipeline Jenkins a échoué.
+                        mimeType: 'text/html',
 
-            Projet : Sokali
-            Build : ${env.BUILD_NUMBER}
+                        body: """
 
-            URL Jenkins :
-            ${env.BUILD_URL}
+                        <html>
+                        <body>
 
-            Consultez le rapport Playwright :
 
-            ${env.BUILD_URL}Rapport_Playwright/
+                        <h2>Pipeline Sokali en échec</h2>
 
-            Date :
-            ${new Date().format('dd/MM/yyyy HH:mm:ss')}
 
-            Le rapport contient :
-            - les tests échoués ;
-            - les captures d'écran ;
-            - les traces Playwright ;
-            - les vidéos d'erreur si disponibles.
+                        <p>Bonjour,</p>
 
-            Cordialement,
-            Jenkins
-            """,
 
-                            attachmentsPattern: 'playwright-report.zip',
+                        <p>
+                        Le pipeline Jenkins a rencontré une erreur.
+                        </p>
 
-                            mimeType: 'text/html'
-                        )
 
-                        echo "Email d'échec envoyé avec rapport Playwright."
+                        <table border="1" cellpadding="8">
 
-                    } catch(Exception e) {
+                            <tr>
+                                <td><b>Projet</b></td>
+                                <td>Sokali</td>
+                            </tr>
 
-                        echo "Erreur pendant l'envoi de l'email : ${e.getMessage()}"
+                            <tr>
+                                <td><b>Build</b></td>
+                                <td>${env.BUILD_NUMBER}</td>
+                            </tr>
 
-                    }
+                            <tr>
+                                <td><b>Date</b></td>
+                                <td>${new Date().format('dd/MM/yyyy HH:mm:ss')}</td>
+                            </tr>
+
+                        </table>
+
+
+                        <h3>Informations de debug</h3>
+
+
+                        <p>
+                        Rapport Playwright :
+                        <br>
+
+                        <a href="${env.BUILD_URL}Rapport_Playwright/">
+                        Ouvrir le rapport des tests
+                        </a>
+
+                        </p>
+
+
+                        <p>
+                        Logs Jenkins :
+                        <br>
+
+                        <a href="${env.BUILD_URL}console">
+                        Voir la console Jenkins
+                        </a>
+
+                        </p>
+
+
+                        <br>
+
+
+                        <p>
+                        Cordialement,<br>
+                        Jenkins CI/CD
+                        </p>
+
+
+                        </body>
+                        </html>
+
+                        """,
+
+                        attachmentsPattern: 'playwright-report.zip'
+
+                    )
+
+
+                    echo "Email FAILURE envoyé avec succès"
+
+
+                } catch(Exception e) {
+
+
+                    echo "Erreur envoi email FAILURE : ${e.getMessage()}"
+
 
                 }
+
             }
+        }
     }
 }
