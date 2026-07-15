@@ -1,25 +1,70 @@
 // playwright.config.ts
+
 import { defineConfig, devices } from '@playwright/test';
 
 export default defineConfig({
+
+  // Dossier contenant les tests
   testDir: './tests',
 
-  // Générer un rapport HTML dans le dossier playwright-report
-  reporter: [
-    ['html', { outputFolder: 'playwright-report', open: 'never' }]
-  ],
+  // Exécution adaptée à Jenkins
+  fullyParallel: true,
 
-  // Timeout global pour éviter les erreurs de 30s
+  // Nombre de tentatives supplémentaires en cas d'échec
+  retries: 1,
+
+  // Timeout maximum d'un test
   timeout: 60000,
 
+  // Génération automatique du rapport HTML
+  reporter: [
+    [
+      'html',
+      {
+        outputFolder: 'playwright-report',
+        open: 'never'
+      }
+    ],
+
+    // Rapport lisible dans la console Jenkins
+    [
+      'list'
+    ]
+  ],
+
+
   use: {
-    trace: 'on-first-retry',
+
+    // URL de base de ton application
+    baseURL: 'http://localhost/Sokali/',
+
+    // Capture une trace si le test échoue
+    trace: 'retain-on-failure',
+
+    // Capture écran en cas d'erreur
+    screenshot: 'only-on-failure',
+
+    // Enregistre une vidéo uniquement si le test échoue
+    video: 'retain-on-failure',
+
   },
 
+
   projects: [
+
     {
       name: 'chromium',
-      use: { ...devices['Desktop Chrome'] },
+
+      use: {
+        ...devices['Desktop Chrome'],
+      },
+
     },
+
   ],
+
+
+  // Dossier où Playwright stocke les résultats temporaires
+  outputDir: 'test-results',
+
 });

@@ -67,8 +67,9 @@ pipeline {
                         
                         archiveArtifacts(
                             artifacts: 'playwright-report/**',
-                            allowEmptyArchive: false,
-                            fingerprint: true
+                            allowEmptyArchive: true,
+                            fingerprint: true,
+                            defaultExcludes: false
                         )
                         
                         echo 'Rapport publie dans Jenkins'
