@@ -1,6 +1,5 @@
 import { defineConfig, devices } from '@playwright/test';
 
-
 export default defineConfig({
 
   testDir: './tests',
@@ -20,7 +19,9 @@ export default defineConfig({
         open: 'never'
       }
     ],
-    'list'
+    [
+      'list'
+    ]
   ],
 
 
@@ -53,15 +54,17 @@ export default defineConfig({
   projects: [
 
     {
-      name:'chromium',
-      use:{
+      name: 'chromium',
+
+      use: {
         ...devices['Desktop Chrome']
       }
+
     }
 
   ],
 
 
-  outputDir:'test-results'
+  outputDir: 'test-results'
 
 });

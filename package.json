@@ -3,27 +3,29 @@
   "version": "1.0.0",
   "description": "Projet e-commerce Sokali",
   "main": "script.js",
+
   "scripts": {
-    "test": "npx playwright test",
-    "test:report": "npx playwright show-report"
+    "test": "playwright test",
+    "test:report": "playwright show-report"
   },
+
   "repository": {
     "type": "git",
     "url": "git+https://github.com/loic321/projet-sokali.git"
   },
+
   "keywords": [
     "ecommerce",
     "sokali",
     "playwright",
     "testing"
   ],
+
   "author": "Loïc",
   "license": "ISC",
-  "type": "commonjs",
-  "bugs": {
-    "url": "https://github.com/loic321/projet-sokali/issues"
-  },
-  "homepage": "https://github.com/loic321/projet-sokali#readme",
+
+  "type": "module",
+
   "devDependencies": {
     "@playwright/test": "^1.61.1",
     "@types/node": "^26.1.1",

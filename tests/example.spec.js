@@ -1,13 +1,14 @@
 import { test, expect } from '@playwright/test';
 
+
 test.describe('Page Sokali', () => {
 
 
   test('Chargement et contenu statique', async ({ page }) => {
 
+
     await page.goto('/');
 
-    // Attendre le chargement du DOM
     await page.waitForLoadState('domcontentloaded');
 
 
@@ -15,17 +16,17 @@ test.describe('Page Sokali', () => {
     await expect(page).toHaveTitle(/SOKALI/i);
 
 
-    // Vérification que le body existe
+    // Vérification body
     const body = page.locator('body');
 
     await expect(body).toBeVisible();
 
 
-    // Vérification du contenu principal
+    // Vérification contenu
     await expect(body).toContainText('SOKALI');
 
 
-    // Vérification du header
+    // Vérification header obligatoire
     const header = page.locator('header');
 
     await expect(header).toHaveCount(1);
@@ -34,7 +35,7 @@ test.describe('Page Sokali', () => {
     console.log('Header présent');
 
 
-    // Vérification du logo
+    // Vérification logo obligatoire
     const logo = page.locator('.logo, .logo-marque');
 
     await expect(logo.first()).toBeVisible();
@@ -42,58 +43,65 @@ test.describe('Page Sokali', () => {
     console.log('Logo présent');
 
 
-    // Vérification de la barre de recherche
+    // Vérification barre recherche obligatoire
     const search = page.locator(
-        'input[type="search"], input[type="text"]'
+      'input[type="search"], input[type="text"]'
     ).first();
 
 
-    if (await search.count() > 0) {
-
-        await expect(search).toBeVisible();
-
-        await search.fill('ordinateur');
-
-        await expect(search).toHaveValue('ordinateur');
-
-        console.log('Recherche fonctionnelle');
-
-    }
+    await expect(search).toBeVisible();
 
 
-    // Vérification des cartes produits
+    await search.fill('ordinateur');
+
+
+    await expect(search)
+      .toHaveValue('ordinateur');
+
+
+    console.log('Recherche fonctionnelle');
+
+
+
+    // Vérification cartes produits obligatoire
+
     const cards = page.locator(
-        '.annonce-card, .product-card, .card'
+      '.annonce-card, .product-card, .card'
     );
 
 
-    if (await cards.count() > 0) {
-
-        await expect(cards.first()).toBeVisible();
-
-        console.log(
-            `${await cards.count()} cartes produits trouvées`
-        );
-
-    }
+    await expect(cards.first()).toBeVisible();
 
 
-    // Vérification footer
+    expect(await cards.count())
+      .toBeGreaterThan(0);
+
+
+    console.log(
+      `${await cards.count()} cartes produits trouvées`
+    );
+
+
+
+    // Vérification footer obligatoire
+
     const footer = page.locator('footer');
 
 
-    if (await footer.count() > 0) {
+    await expect(footer).toHaveCount(1);
 
-        await expect(footer).toBeVisible();
+    await expect(footer).toBeVisible();
 
-        console.log('Footer présent');
 
-    }
+    console.log('Footer présent');
 
 
     console.log('Structure générale Sokali valide');
 
+
   });
+
+
 
 
 
@@ -106,76 +114,84 @@ test.describe('Page Sokali', () => {
     await page.waitForLoadState('domcontentloaded');
 
 
+
     // Test recherche
+
     const search = page.locator(
-        'input[type="search"], input[type="text"]'
+      'input[type="search"], input[type="text"]'
     ).first();
 
 
-    if (await search.count() > 0) {
-
-        await search.fill('ordinateur');
-
-        await expect(search)
-            .toHaveValue('ordinateur');
+    await search.fill('ordinateur');
 
 
-    }
+    await expect(search)
+      .toHaveValue('ordinateur');
+
 
 
     // Test bouton
+
     const button = page.locator('button').first();
 
 
-    if (await button.count() > 0) {
+    await expect(button).toBeVisible();
 
-        await expect(button).toBeVisible();
 
-        await button.click();
+    await button.click();
 
-        console.log('Bouton cliqué');
 
-    }
+    console.log('Bouton cliqué');
 
 
   });
 
 
 
+
+
+
   test('Vérification de la structure HTML du Body', async ({ page }) => {
 
 
-   await page.goto('/');
+
+    await page.goto('/');
 
 
     await page.waitForLoadState('domcontentloaded');
 
 
-    // Le body doit contenir des éléments
+
+    // Vérification des éléments principaux du body
+
     const bodyChildren = await page.locator('body > *').count();
 
 
-    expect(bodyChildren).toBeGreaterThan(0);
+    expect(bodyChildren)
+      .toBeGreaterThan(0);
+
 
 
     console.log(
-        `Le body contient ${bodyChildren} éléments principaux`
+      `Le body contient ${bodyChildren} éléments principaux`
     );
 
 
-    // Vérifier les sections principales
+
+    // Vérification structure HTML
 
     const sections = page.locator(
-        'header, main, section, footer'
+      'header, main, section, footer'
     );
 
 
     expect(await sections.count())
-        .toBeGreaterThan(0);
+      .toBeGreaterThan(0);
+
 
 
     console.log(
-        `${await sections.count()} sections HTML détectées`
+      `${await sections.count()} sections HTML détectées`
     );
 
 
