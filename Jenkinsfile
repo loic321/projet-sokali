@@ -38,29 +38,7 @@ pipeline {
             }
         }
 
-        stage('Deploy to Apache') {
-            steps {
-                script {
-                    def sourceDir = fileExists('docs/index.html') ? 'docs' : '.'
-                    
-                    bat """
-                        echo "Nettoyage de l'ancien deploiement..."
-                        if exist ${APACHE_DEPLOY} rmdir /s /q ${APACHE_DEPLOY}
-                        mkdir ${APACHE_DEPLOY}
-                        
-                        echo "Copie des fichiers depuis ${sourceDir}/ vers Apache..."
-                        xcopy /E /I /Y ${sourceDir}\\* ${APACHE_DEPLOY}\\
-                        echo "Copie terminee"
-                    """
-                    
-                    if (fileExists('C:/Apache24/htdocs/Sokali/index.html')) {
-                        echo 'Deploiement reussi - index.html present'
-                    } else {
-                        error 'Deploiement echoue - index.html absent'
-                    }
-                }
-            }
-        }
+        
         
         stage('Run Tests') {
                 steps {
@@ -104,8 +82,31 @@ pipeline {
                     }
 
                 }
+        }
+
+        stage('Deploy to Apache') {
+            steps {
+                script {
+                    def sourceDir = fileExists('docs/index.html') ? 'docs' : '.'
+                    
+                    bat """
+                        echo "Nettoyage de l'ancien deploiement..."
+                        if exist ${APACHE_DEPLOY} rmdir /s /q ${APACHE_DEPLOY}
+                        mkdir ${APACHE_DEPLOY}
+                        
+                        echo "Copie des fichiers depuis ${sourceDir}/ vers Apache..."
+                        xcopy /E /I /Y ${sourceDir}\\* ${APACHE_DEPLOY}\\
+                        echo "Copie terminee"
+                    """
+                    
+                    if (fileExists('C:/Apache24/htdocs/Sokali/index.html')) {
+                        echo 'Deploiement reussi - index.html present'
+                    } else {
+                        error 'Deploiement echoue - index.html absent'
+                    }
+                }
             }
-        
+        }
         
         stage('Verify Deployment') {
             steps {
