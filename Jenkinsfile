@@ -49,36 +49,36 @@ pipeline {
             }
         }
         
-        stage('Publish Report') {
-            steps {
-                script {
-                    if (fileExists('playwright-report/index.html')) {
-                        echo 'Rapport Playwright genere'
-                        
-                        publishHTML([
-                            allowMissing: false,
-                            alwaysLinkToLastBuild: true,
-                            keepAll: true,
-                            reportDir: 'playwright-report',
-                            reportFiles: 'index.html',
-                            reportName: 'Rapport Playwright',
-                            includes: '**/*'
-                        ])
-                        
-                        archiveArtifacts(
-                            artifacts: 'playwright-report/**',
-                            allowEmptyArchive: true,
-                            fingerprint: true,
-                            defaultExcludes: false
-                        )
-                        
-                        echo 'Rapport publie dans Jenkins'
-                    } else {
-                        echo 'Aucun rapport Playwright trouve'
+       stage('Publish Report') {
+
+                steps {
+
+                    script {
+
+                        if(fileExists('playwright-report/index.html')) {
+
+                            echo "Rapport Playwright trouvé"
+
+                            publishHTML([
+                                allowMissing: false,
+                                alwaysLinkToLastBuild: true,
+                                keepAll: true,
+                                reportDir: 'playwright-report',
+                                reportFiles: 'index.html',
+                                reportName: 'Rapport Playwright',
+                                includes: '**/*'
+                            ])
+
+                        } else {
+
+                            error "Rapport Playwright absent"
+
+                        }
+
                     }
+
                 }
             }
-        }
         
         stage('Deploy to Apache') {
             steps {
