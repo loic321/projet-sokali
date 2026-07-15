@@ -28,19 +28,18 @@ test.describe('Page Sokali', () => {
     // Vérification du header
     const header = page.locator('header');
 
-    if (await header.count() > 0) {
-        await expect(header).toBeVisible();
-        console.log('Header présent');
-    }
+    await expect(header).toHaveCount(1);
+    await expect(header).toBeVisible();
+
+    console.log('Header présent');
 
 
     // Vérification du logo
     const logo = page.locator('.logo, .logo-marque');
 
-    if (await logo.count() > 0) {
-        await expect(logo.first()).toBeVisible();
-        console.log('Logo présent');
-    }
+    await expect(logo.first()).toBeVisible();
+
+    console.log('Logo présent');
 
 
     // Vérification de la barre de recherche
