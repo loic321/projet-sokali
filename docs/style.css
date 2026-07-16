@@ -655,7 +655,7 @@ p  { color: var(--t2); line-height: 1.78; }
 }
 .annonce-titre{
   display: -webkit-box;
-  font-size: 1rem;
+  font-size: 1.1rem;
   -webkit-line-clamp: 2;        /* nombre de lignes */
   -webkit-box-orient: vertical;
   width: 280px;
@@ -674,7 +674,6 @@ p  { color: var(--t2); line-height: 1.78; }
   overflow: hidden;
   text-overflow: ellipsis;
   color: var(--t3);
-  margin-bottom: 8px;
   line-height: 1.1rem;
 }
 .annonce-prix{
@@ -726,23 +725,26 @@ p  { color: var(--t2); line-height: 1.78; }
   color:      rgba(255,255,255,.45);
   display:    flex;
   gap:        2rem;
-  padding:    2rem;
+  padding:    4rem 0 1.5rem 6rem;
   font-size:  0.875rem;
 }
 
 .footer-soka {  color: #fff; }
 .footer-soka .logo-accent { color: var(--p); }
-.f { 
-  display: flex;
-  flex-direction: column;
-  gap: 2rem;
-  margin: 50px 50px 0px 50px;
- }
-.ftr-brand { display: flex; flex-direction: column; gap: 1rem; width: 25%; margin-right: 8rem; }
-.ftr-g { display: flex; flex-direction: row; gap: 2rem; } 
-.ftr-col { display: flex; flex-direction: column; gap: 0.5rem; width: 20%; }
-.ftr-bt { display: flex; justify-content: space-between; margin-top: 2rem; }
-.ftr-bt-lks { display: flex; gap: 5em; }
+.ftr{background:var(--inv);color:#fff;padding:4rem 0 0}
+.ftr-g{display:grid;grid-template-columns:2fr 1fr 1fr 1fr;gap:8rem;padding-bottom:3rem;padding-right: 5.5rem;   border-bottom:1px solid rgba(255,255,255,.08)}
+@media(max-width:1024px){.ftr-g{grid-template-columns:repeat(2,1fr)}}
+@media(max-width:600px){.ftr-g{grid-template-columns:1fr}}
+.ftr-brand .logo{color:#fff;margin-bottom:1rem}
+.ftr-brand p{color:rgba(255,255,255,.5);font-size:.875rem;line-height:1.82;max-width:32ch;margin-bottom:1.25rem}
+.soc-links{display:flex;gap:.625rem}
+.soc-a{width:38px;height:38px;border-radius:50%;background:rgba(255,255,255,.08);display:flex;align-items:center;justify-content:center;color:#fff;font-size:.84rem;transition:background-color var(--ta),transform var(--ta)}
+.soc-a:hover{background:var(--p);transform:translateY(-3px)}.soc-a:active{transform:scale(.92)}
+.ftr-col h5{font-size:.75rem;font-weight:700;text-transform:uppercase;letter-spacing:.09em;color:rgba(255,255,255,.3);margin-bottom:1rem}
+.ftr-col a{display:block;color:rgba(255,255,255,.52);font-size:.875rem;padding:.3rem 0;transition:color var(--ta);}.ftr-col a:hover{color:var(--p);padding-left:5px}
+.ftr-bt{padding:1.5rem 0 0 0;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:.5rem}
+.ftr-bt p,.ftr-bt a{color:rgba(255,255,255,.28);font-size:.75rem}
+.ftr-bt-lk{display:flex;gap:1.25rem}.ftr-bt-lk a{transition:color var(--ta)}.ftr-bt-lk a:hover{color:rgba(255,255,255,.7)}
 /*  MEDIA QUERIES */
 
 /* Tablette large */
