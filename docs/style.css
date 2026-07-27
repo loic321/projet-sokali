@@ -287,6 +287,12 @@ p  { color: var(--t2); line-height: 1.78; }
 
 .logo-accent { color: var(--p); }
 
+.logo-swap { fill: var(--dark); }
+.logo-seam { fill: var(--bg); }
+
+[data-theme=dark] .logo-swap { fill: var(--bg); }
+[data-theme=dark] .logo-seam { fill: var(--dark); }
+
 /* Barre de recherche */
 .search-wrapper {
   display:     flex;
@@ -449,6 +455,11 @@ p  { color: var(--t2); line-height: 1.78; }
     justify-content: center;
     gap: 40px;
 }
+.w {
+    max-width: 1360px;
+    margin: 0 auto;
+    padding: 0 2.5rem;
+}
 .trust-item{
     color: var(--p);
     display: flex;
@@ -475,12 +486,12 @@ p  { color: var(--t2); line-height: 1.78; }
 /* SECTIONS — STYLES COMMUNS */
 
 .categories,
-.annonces {
+.annonce {
   padding: 3.5rem 2.4rem;
 }
 
 .categories { background: var(--s);  }
-.annonces   { background: var(--bg); }
+.annonce    { background: var(--bg); }
 
 .section-entete {
   text-align:    center;
@@ -527,6 +538,8 @@ p  { color: var(--t2); line-height: 1.78; }
     border-color     var(--tb),
     background-color var(--tb);
 }
+
+
 
 @media (hover: hover) {
   .categorie-item:hover {
@@ -578,9 +591,6 @@ p  { color: var(--t2); line-height: 1.78; }
 .categorie-count { font-size: 0.68rem; color: var(--t3); }
 
 /* ANNONCES */
-.annonce{
-  padding: 25px 90px;
-}
 /* Mobile d'abord (par défaut) */
 .annonce-grille {
   display: grid;
@@ -658,7 +668,7 @@ p  { color: var(--t2); line-height: 1.78; }
   font-size: 1.1rem;
   -webkit-line-clamp: 2;        /* nombre de lignes */
   -webkit-box-orient: vertical;
-  width: 280px;
+  width: 100%;
   height: 2.4rem;
   font-weight: bold;
   margin-bottom: 8px;
@@ -670,7 +680,7 @@ p  { color: var(--t2); line-height: 1.78; }
   font-size: 0.775rem;
   -webkit-line-clamp: 2;        /* nombre de lignes */
   -webkit-box-orient: vertical;
-  width: 280px;
+  width: 100%;
   overflow: hidden;
   text-overflow: ellipsis;
   color: var(--t3);
@@ -706,6 +716,153 @@ p  { color: var(--t2); line-height: 1.78; }
     color: var(--p);
     font-size: 0.75rem;
 }
+
+
+/* ============================================= */
+/*  ANIMATIONS & MICRO-INTERACTIONS               */
+/* ============================================= */
+
+/* --- Cartes d'annonces : léger soulèvement + ombre au survol --- */
+.annonce-card {
+  transition: transform var(--tc), box-shadow var(--tc), border-color var(--tc);
+}
+@media (hover: hover) {
+  .annonce-card:hover {
+    transform:    translateY(-6px);
+    box-shadow:   var(--s3);
+    border-color: var(--bd2);
+  }
+}
+.annonce-card:active { transform: translateY(-2px) scale(0.995); }
+
+/* --- Zoom doux de l'image dans la carte au survol --- */
+.annonce-image-wrap {
+  overflow:      hidden;
+  border-radius: 20px 20px 0 0;
+}
+.annonce-image-wrap .annonce-image {
+  border-radius: 0;
+  transition: transform var(--td);
+}
+@media (hover: hover) {
+  .annonce-card:hover .annonce-image-wrap .annonce-image {
+    transform: scale(1.08);
+  }
+}
+
+/* --- Bouton favoris : pop + remplissage du cœur --- */
+.annonce-badge,
+.btn-like {
+  z-index: 2;
+}
+.btn-like {
+  transition: transform var(--tb), background-color var(--tb);
+}
+.btn-like i {
+  color: var(--t3);
+  transition: color var(--tb), transform var(--tb);
+}
+.btn-like:hover {
+  transform: scale(1.1);
+}
+.btn-like:active i,
+.btn-like.liked i {
+  animation: likePop 0.4s cubic-bezier(.17,.89,.32,1.49);
+}
+.btn-like.liked i {
+  color: red;
+  font-weight: 900;
+}
+@keyframes likePop {
+  0%   { transform: scale(1);   }
+  40%  { transform: scale(1.4); }
+  100% { transform: scale(1);   }
+}
+
+/* --- Icônes de catégories : rebond + légère rotation au survol --- */
+@media (hover: hover) {
+  .categorie-item:hover .categorie-icone {
+    animation: iconeBounce 0.5s ease;
+  }
+}
+@keyframes iconeBounce {
+  0%   { transform: scale(1)    rotate(0deg);   }
+  40%  { transform: scale(1.15) rotate(-8deg);  }
+  70%  { transform: scale(0.95) rotate(4deg);   }
+  100% { transform: scale(1)    rotate(0deg);   }
+}
+
+/* --- Effet de brillance qui balaie les boutons pleins au survol --- */
+.btn-orange,
+.btn-vert {
+  position: relative;
+  overflow: hidden;
+}
+.btn-orange::after,
+.btn-vert::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -75%;
+  width: 50%;
+  height: 100%;
+  background: linear-gradient(120deg, transparent, rgba(255,255,255,.35), transparent);
+  transform: skewX(-20deg);
+  transition: left var(--td);
+}
+.btn-orange:hover::after,
+.btn-vert:hover::after {
+  left: 125%;
+}
+
+/* --- Rotation de l'icône du bouton "Filtrer & Trier" quand le panneau est ouvert --- */
+.btn-filtre i {
+  transition: transform var(--tb);
+}
+.btn-filtre.actif i {
+  transform: rotate(180deg);
+}
+
+/* --- Header : légère compression + ombre une fois le scroll commencé --- */
+.header.scrolled {
+  height:     56px;
+  box-shadow: var(--s1);
+}
+.header.scrolled .logo-marque { transform: scale(0.9); }
+
+/* --- Apparition progressive au scroll (cartes, catégories) --- */
+.categorie-item,
+.annonce-card {
+  opacity:   0;
+  transform: translateY(24px);
+  transition: opacity var(--td), transform var(--td);
+}
+.categorie-item.visible,
+.annonce-card.visible {
+  opacity:   1;
+  transform: translateY(0);
+}
+/* décalage en cascade selon la position dans la grille */
+.categories-grille .categorie-item:nth-child(1) { transition-delay: 0.03s; }
+.categories-grille .categorie-item:nth-child(2) { transition-delay: 0.06s; }
+.categories-grille .categorie-item:nth-child(3) { transition-delay: 0.09s; }
+.categories-grille .categorie-item:nth-child(4) { transition-delay: 0.12s; }
+.categories-grille .categorie-item:nth-child(5) { transition-delay: 0.15s; }
+.categories-grille .categorie-item:nth-child(6) { transition-delay: 0.18s; }
+.categories-grille .categorie-item:nth-child(7) { transition-delay: 0.21s; }
+.annonce-grille .annonce-card:nth-child(1) { transition-delay: 0.05s; }
+.annonce-grille .annonce-card:nth-child(2) { transition-delay: 0.1s;  }
+.annonce-grille .annonce-card:nth-child(3) { transition-delay: 0.15s; }
+.annonce-grille .annonce-card:nth-child(4) { transition-delay: 0.2s;  }
+
+/* Si JS désactivé/non chargé : on ne bloque pas l'affichage du contenu */
+.no-js .categorie-item,
+.no-js .annonce-card {
+  opacity: 1;
+  transform: none;
+}
+
+
 /*  PLACEHOLDER  */
 
 .placeholder {

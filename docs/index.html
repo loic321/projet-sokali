@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="fr" data-theme="light"> <!--pour plutard-->  
+<html lang="fr" data-theme="light" class="no-js"> <!--pour plus tard-->  
 
   <!--HEAD-->
   <head>
@@ -22,6 +22,7 @@
     <!-- Icônes -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 
+    <link rel="icon" type="image/svg+xml" href="assets/sokali-icon.svg">
     <!-- Styles -->
     <link rel="stylesheet" href="style.css">
     <script src="script.js" defer></script>
@@ -39,9 +40,19 @@
       <nav class="nav" aria-label="Navigation principale">
 
         <!-- Logo -->
-        <a href="index.html" class="logo" aria-label="SOKALI — Retour à l'accueil">
-          <div class="logo-marque" aria-hidden="true">S</div>
-          <span>SOKA<span class="logo-accent">LI</span></span>
+         <a href="index.html" class="logo" aria-label="SOKALI — Retour à l'accueil">
+          <svg viewBox="80 60 700 240" width="160" height="55" role="img" aria-hidden="true">
+            <defs>
+              <clipPath id="sk-u"><polygon points="108,85 252,85 252,194 108,155"/></clipPath>
+              <clipPath id="sk-l"><polygon points="108,155 252,194 252,255 108,255"/></clipPath>
+            </defs>
+            <g transform="rotate(-7,180,170)">
+              <text x="120" y="242" font-family="Fraunces, serif" font-size="200" font-weight="900" clip-path="url(#sk-u)" fill="#E8721A">S</text>
+              <text x="120" y="242" font-family="Fraunces, serif" font-size="200" font-weight="900" clip-path="url(#sk-l)" class="logo-swap">S</text>
+              <polygon points="180,163 191,174.5 180,186 169,174.5" class="logo-seam"/>
+            </g>
+            <text x="255" y="242" font-family="Fraunces, serif" font-size="200" font-weight="900" letter-spacing="-4" class="logo-swap">oka<tspan fill="#E8721A">li</tspan></text>
+          </svg>
         </a>
 
         <!-- Recherche -->
@@ -187,7 +198,7 @@
 
 
       <!-- SECTION : ANNONCES  -->
-      <section class="annonce" aria-labelledby="annonces-titre">
+      <section class="annonce" aria-labelledby="annonce-titre">
 
         <div class="section-entete">
           <h2 id="annonce-titre" >Annonces à la une</h2>
@@ -202,10 +213,10 @@
 
           <article class="annonce-card" role="listitem" aria-label="Annonce 1 : iphone 13 Pro Max à 300 000 FCFA">
             <div class="annonce-badge" aria-hidden="true">URGENT</div>
-            <button class="btn-like" type="button" aria-label="mettre en favoris">
+            <button class="btn-like" type="button" aria-label="mettre en favoris" aria-pressed="false">
                 <i class="fas fa-heart" aria-hidden="true"></i>
               </button>
-            <img src="0dacae7941bdf84ae61eef4f072e5d37.png" alt="Annonce iphone 13 Pro Max" loading="lazy" class="annonce-image">
+            <div class="annonce-image-wrap"><img src="0dacae7941bdf84ae61eef4f072e5d37.png" alt="Annonce iphone 13 Pro Max" loading="lazy" class="annonce-image"></div>
             <div class="annonce-detail">
               
               <p class="annonce-categorie">ÉLECTRONIQUE</p>
@@ -223,12 +234,12 @@
               </div>
            </div>
           </article>
-          <article class="annonce-card" role="listitem" aria-label="Annonce 2 : iphone 13 Pro Max à 300 000 FCFA">
+          <article class="annonce-card" role="listitem" aria-label="Annonce 2 : iphone 14 Pro Max à 400 000 FCFA">
             <div class="annonce-badge" aria-hidden="true">URGENT</div>
-            <button class="btn-like" type="button" aria-label="mettre en favoris">
+            <button class="btn-like" type="button" aria-label="mettre en favoris" aria-pressed="false">
                 <i class="fas fa-heart" aria-hidden="true"></i>
               </button>
-            <img src="0dacae7941bdf84ae61eef4f072e5d37.png" alt="Annonce iphone 13 Pro Max" loading="lazy" class="annonce-image">
+            <div class="annonce-image-wrap"><img src="0dacae7941bdf84ae61eef4f072e5d37.png" alt="Annonce iphone 13 Pro Max" loading="lazy" class="annonce-image"></div>
             <div class="annonce-detail">
               
               <p class="annonce-categorie">ÉLECTRONIQUE</p>
@@ -246,12 +257,12 @@
               </div>
            </div>
           </article>
-          <article class="annonce-card" role="listitem" aria-label="Annonce 3 : iphone 13 Pro Max à 300 000 FCFA">
+          <article class="annonce-card" role="listitem" aria-label="Annonce 3 : iphone 15 Pro Max à 500 000 FCFA">
             <div class="annonce-badge" aria-hidden="true">URGENT</div>
-            <button class="btn-like" type="button" aria-label="mettre en favoris">
+            <button class="btn-like" type="button" aria-label="mettre en favoris" aria-pressed="false">
                 <i class="fas fa-heart" aria-hidden="true"></i>
               </button>
-            <img src="0dacae7941bdf84ae61eef4f072e5d37.png" alt="Annonce iphone 13 Pro Max" loading="lazy" class="annonce-image">
+            <div class="annonce-image-wrap"><img src="0dacae7941bdf84ae61eef4f072e5d37.png" alt="Annonce iphone 13 Pro Max" loading="lazy" class="annonce-image"></div>
             <div class="annonce-detail">
               
               <p class="annonce-categorie">ÉLECTRONIQUE</p>
@@ -269,12 +280,12 @@
               </div>
           </div>
           </article>
-          <article class="annonce-card" role="listitem" aria-label="Annonce 4 : iphone 13 Pro Max à 300 000 FCFA">
+          <article class="annonce-card" role="listitem" aria-label="Annonce 4 : iphone 16 Pro Max à 600 000 FCFA">
             <div class="annonce-badge" aria-hidden="true">URGENT</div>
-            <button class="btn-like" type="button" aria-label="mettre en favoris">
+            <button class="btn-like" type="button" aria-label="mettre en favoris" aria-pressed="false">
                 <i class="fas fa-heart" aria-hidden="true"></i>
               </button>
-            <img src="0dacae7941bdf84ae61eef4f072e5d37.png" alt="Annonce iphone 13 Pro Max" loading="lazy" class="annonce-image">
+            <div class="annonce-image-wrap"><img src="0dacae7941bdf84ae61eef4f072e5d37.png" alt="Annonce iphone 13 Pro Max" loading="lazy" class="annonce-image"></div>
             <div class="annonce-detail">
               
               <p class="annonce-categorie">ÉLECTRONIQUE</p>
@@ -309,7 +320,17 @@
         <div class="ftr-g">
           <div class="ftr-brand">
             <a href="index.html" class="logo" aria-label="SOKALI — Retour à l'accueil">
-              <div class="logo-marque" aria-hidden="true">S</div>
+              <svg viewBox="95 65 175 210" width="30" height="36" role="img" aria-hidden="true">
+                <defs>
+                  <clipPath id="ftr-sk-u"><polygon points="108,85 252,85 252,194 108,155"/></clipPath>
+                  <clipPath id="ftr-sk-l"><polygon points="108,155 252,194 252,255 108,255"/></clipPath>
+                </defs>
+                <g transform="rotate(-7,180,170)">
+                  <text x="120" y="242" font-family="Fraunces, serif" font-size="200" font-weight="900" clip-path="url(#ftr-sk-u)" fill="#E8721A">S</text>
+                  <text x="120" y="242" font-family="Fraunces, serif" font-size="200" font-weight="900" clip-path="url(#ftr-sk-l)" fill="#FDFAF5">S</text>
+                  <polygon points="180,163 191,174.5 180,186 169,174.5" fill="#1A1A2E"/>
+                </g>
+              </svg>
               <span class="footer-soka">SOKA<span class="logo-accent">LI</span></span>
             </a>
             <p>La marketplace locale qui connecte acheteurs et vendeurs à travers toute l'Afrique. Simple, rapide, de confiance.</p>
@@ -320,8 +341,8 @@
               <a href="#" class="soc-a" aria-label="WhatsApp SOKALI"><i class="fab fa-whatsapp" aria-hidden="true"></i></a>
             </div>
           </div>
-          <nav class="ftr-col" aria-label="Explorer SOKALI"><h5>Explorer</h5><a href="#" onclick="nav('home');return false">Toutes les annonces</a><a href="#">Annonces urgentes</a><a href="#">Nouveautés</a><a href="#">Catégories</a></nav>
-          <nav class="ftr-col" aria-label="Mon compte"><h5>Mon compte</h5><a href="#" onclick="openAuth();return false">Se connecter</a><a href="#" onclick="openAuth();return false">Créer un compte</a><a href="#" onclick="checkThenPublish();return false">Publier une annonce</a><a href="#" onclick="showFavs();return false">Mes favoris</a></nav>
+          <nav class="ftr-col" aria-label="Explorer SOKALI"><h5>Explorer</h5><a href="#" >Toutes les annonces</a><a href="#">Annonces urgentes</a><a href="#">Nouveautés</a><a href="#">Catégories</a></nav>
+          <nav class="ftr-col" aria-label="Mon compte"><h5>Mon compte</h5><a href="#" >Se connecter</a><a href="#" >Créer un compte</a><a href="#" >Publier une annonce</a><a href="#" >Mes favoris</a></nav>
           <nav class="ftr-col" aria-label="Informations"><h5>Informations</h5><a href="#">À propos de SOKALI</a><a href="#">Aide & Support</a><a href="#">Signaler une annonce</a><a href="#">Mentions légales</a></nav>
         </div>
         <div class="ftr-bt">
