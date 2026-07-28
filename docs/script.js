@@ -84,4 +84,18 @@ document.addEventListener('DOMContentLoaded', () => {
     }); 
 
   });
+
+  /*Menu hamburger mobile*/
+  const menuToggle = document.querySelector('.menu-toggle');
+  const mobileMenu = document.querySelector('.mobile-menu');
+
+  if (menuToggle && mobileMenu) {
+    menuToggle.addEventListener('click', () => {
+      // toggle() renvoie true si la classe vient d'être AJOUTÉE (menu ouvert)
+      const estOuvert = mobileMenu.classList.toggle('ouvert');
+
+      // On synchronise aria-expanded avec l'état réel du menu
+      menuToggle.setAttribute('aria-expanded', estOuvert ? 'true' : 'false');
+    });
+  }
 });

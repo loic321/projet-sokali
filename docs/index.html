@@ -7,7 +7,7 @@
     <meta charset="UTF-8">
     <meta name="viewport"    content="width=device-width, initial-scale=1.0, viewport-fit=cover">
     <meta name="description" content="SOKALI — La marketplace locale N°1 en Afrique. Achetez et vendez près de chez vous.">
-   
+    <meta name="theme-color" content="#E8721A">
 
     <!-- Open Graph -->
     <meta property="og:title"       content="SOKALI | Marketplace locale">
@@ -78,8 +78,43 @@
             Se connecter
           </button>
         </div>
+        <button class="menu-toggle" aria-label="Ouvrir le menu" aria-expanded="false">
+          <i class="fas fa-bars"></i>
+        </button>
 
       </nav>
+
+       <div class="mobile-menu" id="mobileMenu">
+
+          <!-- Navigation : liens vers les futures pages/vues du site -->
+          <nav class="mobile-menu-nav" aria-label="Navigation mobile">
+            <a href="#" class="mobile-menu-link">
+              <i class="fas fa-home" aria-hidden="true"></i> Accueil
+            </a>
+            <a href="#" class="mobile-menu-link">
+              <i class="fas fa-heart" aria-hidden="true"></i> Mes favoris
+            </a>
+            <a href="#" class="mobile-menu-link">
+              <i class="fas fa-comment-dots" aria-hidden="true"></i> Messages
+            </a>
+            <a href="#" class="mobile-menu-link">
+              <i class="fas fa-user-circle" aria-hidden="true"></i> Mon profil
+            </a>
+          </nav>
+
+          <!-- Actions principales -->
+          <div class="mobile-menu-actions">
+            <button class="btn btn-orange" type="button">
+              <i class="fas fa-plus" aria-hidden="true"></i>
+              Publier une annonce
+            </button>
+            <button class="btn btn-vert" type="button">
+              <i class="fas fa-user" aria-hidden="true"></i>
+              Se connecter
+            </button>
+          </div>
+
+        </div>
 
     </header>
     <!-- /header -->
@@ -330,7 +365,7 @@
                   <text x="120" y="242" font-family="Fraunces, serif" font-size="200" font-weight="900" clip-path="url(#ftr-sk-l)" fill="#FDFAF5">S</text>
                   <polygon points="180,163 191,174.5 180,186 169,174.5" fill="#1A1A2E"/>
                 </g>
-              </svg>
+              </svg> 
               <span class="footer-soka">SOKA<span class="logo-accent">LI</span></span>
             </a>
             <p>La marketplace locale qui connecte acheteurs et vendeurs à travers toute l'Afrique. Simple, rapide, de confiance.</p>
