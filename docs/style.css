@@ -254,7 +254,7 @@ p  { color: var(--t2); line-height: 1.78; }
   gap:             1rem;
   max-width:       1360px;
   margin:          0 auto;
-  padding:         0 2.5rem;
+  padding:         0 1.5rem;
 }
 
 /* Logo */
@@ -347,7 +347,7 @@ p  { color: var(--t2); line-height: 1.78; }
   display:      none;   /* réactivé uniquement en media query mobile */
   background:   transparent;
   border:       none;
-  font-size:    1.2rem;
+  font-size:    0.825rem;
   color:        var(--t1);
   padding:      0.5rem;
   flex-shrink:  0;
