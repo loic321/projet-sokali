@@ -78,32 +78,51 @@
             Se connecter
           </button>
         </div>
-        <button class="menu-toggle" aria-label="Ouvrir le menu" aria-expanded="false">
+        <button class="menu-toggle" aria-label="Ouvrir le menu" aria-expanded="false" aria-controls="mobileMenu">
           <i class="fas fa-bars"></i>
         </button>
 
       </nav>
 
-       <div class="mobile-menu" id="mobileMenu">
+    </header>
+    <!-- /header -->
 
-          <!-- Navigation : liens vers les futures pages/vues du site -->
-          <nav class="mobile-menu-nav" aria-label="Navigation mobile">
-            <a href="#" class="mobile-menu-link">
+
+    <!--MAIN  -->
+    <main>
+        <!-- Overlay : fond sombre derrière le drawer -->
+        <div class="drawer-overlay" id="drawerOverlay"></div>
+        <!-- Drawer : panneau qui glisse depuis la droite -->
+        <aside class="mobile-drawer" id="mobileDrawer" role="dialog" aria-modal="true" aria-label="Menu de navigation">
+
+          <!-- En-tête du drawer : logo + bouton fermer -->
+          <div class="drawer-header">
+            <div class="drawer-logo">
+              <span>SOKA<span class="logo-accent">LI</span></span>
+            </div>
+            <button class="drawer-close" type="button" id="drwClose" aria-label="Fermer le menu">
+              <i class="fas fa-times" aria-hidden="true"></i>
+            </button>
+          </div>
+
+          <!-- Navigation -->
+          <nav class="drawer-nav" aria-label="Navigation mobile">
+            <a href="#" class="drawer-link">
               <i class="fas fa-home" aria-hidden="true"></i> Accueil
             </a>
-            <a href="#" class="mobile-menu-link">
+            <a href="#" class="drawer-link">
               <i class="fas fa-heart" aria-hidden="true"></i> Mes favoris
             </a>
-            <a href="#" class="mobile-menu-link">
+            <a href="#" class="drawer-link">
               <i class="fas fa-comment-dots" aria-hidden="true"></i> Messages
             </a>
-            <a href="#" class="mobile-menu-link">
+            <a href="#" class="drawer-link">
               <i class="fas fa-user-circle" aria-hidden="true"></i> Mon profil
             </a>
           </nav>
 
           <!-- Actions principales -->
-          <div class="mobile-menu-actions">
+          <div class="drawer-actions">
             <button class="btn btn-orange" type="button">
               <i class="fas fa-plus" aria-hidden="true"></i>
               Publier une annonce
@@ -114,16 +133,7 @@
             </button>
           </div>
 
-        </div>
-
-    </header>
-    <!-- /header -->
-
-
-    <!--MAIN  -->
-    <main>
-
-
+        </aside>
       <!-- SECTION : HERO  -->
       <section class="hero" aria-labelledby="hero-titre">
 
@@ -235,111 +245,21 @@
       <!-- SECTION : ANNONCES  -->
       <section class="annonce" aria-labelledby="annonce-titre">
 
-        <div class="section-entete">
-          <h2 id="annonce-titre" >Annonces à la une</h2>
-          <p class="section-sous-titre">Les meilleures offres du moment</p> 
-           <div class="filtre">
-             <button class="btn btn-filtre" type="button"> <i class="fas fa-sliders-h" aria-hidden="true"></i> Filtrer & Trier </button>
+        <div class="section-entete-right">
+            <div class="flex-container">
+              <div>
+                <h2 id="annonce-titre" >Annonces à la une</h2>
+                <p class="section-sous-titre">Les meilleures offres du moment</p> 
+              </div>
+              <div class="filtre">
+                <button class="btn btn-filtre" type="button"> <i class="fas fa-sliders-h" aria-hidden="true"></i> Filtrer & Trier </button>
+              </div>
             </div>
-       </div>
+          </div>
        
         <!-- grille de cards -->
         <div class="annonce-grille" role="list">
-
-          <article class="annonce-card" role="listitem" aria-label="Annonce 1 : iphone 13 Pro Max à 300 000 FCFA">
-            <div class="annonce-badge" aria-hidden="true">URGENT</div>
-            <button class="btn-like" type="button" aria-label="mettre en favoris" aria-pressed="false">
-                <i class="fas fa-heart" aria-hidden="true"></i>
-              </button>
-            <div class="annonce-image-wrap"><img src="0dacae7941bdf84ae61eef4f072e5d37.png" alt="Annonce iphone 13 Pro Max" loading="lazy" class="annonce-image"></div>
-            <div class="annonce-detail">
-              
-              <p class="annonce-categorie">ÉLECTRONIQUE</p>
-              <h3 class="annonce-titre">Iphone 13 Pro Max Avec Son Kit Ecouteur </h3>
-              <p class="annonce-description">Excellent état, batterie à 97%. Acheté en janvier 2024. Boîte originale, chargeur rapide 30W</p>
-              <p class="annonce-prix">300 000 FCFA</p>
-              <p class="annonce-localisation"> <i class="fa-solid fa-location-dot"></i>    yaoundé , cameroun  </p>
-              
-             
-              <div class="annonce-fin"> 
-                <p class="annonce-date"><i class="fa-regular fa-clock"></i>     Publié le 15 juin 2026</p>
-                <button class="btn" type="button" aria-label="Voir les détails">
-                  <i class="fas fa-eye" aria-hidden="true"></i>
-                </button>
-              </div>
-           </div>
-          </article>
-          <article class="annonce-card" role="listitem" aria-label="Annonce 2 : iphone 14 Pro Max à 400 000 FCFA">
-            <div class="annonce-badge" aria-hidden="true">URGENT</div>
-            <button class="btn-like" type="button" aria-label="mettre en favoris" aria-pressed="false">
-                <i class="fas fa-heart" aria-hidden="true"></i>
-              </button>
-            <div class="annonce-image-wrap"><img src="0dacae7941bdf84ae61eef4f072e5d37.png" alt="Annonce iphone 13 Pro Max" loading="lazy" class="annonce-image"></div>
-            <div class="annonce-detail">
-              
-              <p class="annonce-categorie">ÉLECTRONIQUE</p>
-              <h3 class="annonce-titre">Iphone 14 Pro Max</h3>
-              <p class="annonce-description">Excellent état, batterie à 97%. Acheté en janvier 2024. Boîte originale, chargeur rapide 30W</p>
-              <p class="annonce-prix">400 000 FCFA</p>
-              <p class="annonce-localisation"> <i class="fa-solid fa-location-dot"></i>    yaoundé , cameroun  </p>
-              
-             
-              <div class="annonce-fin">
-                <p class="annonce-date"><i class="fa-regular fa-clock"></i>   Publié le 15 juin 2026</p>
-                <button class="btn" type="button" aria-label="Voir les détails">
-                  <i class="fas fa-eye" aria-hidden="true"></i>
-                </button>
-              </div>
-           </div>
-          </article>
-          <article class="annonce-card" role="listitem" aria-label="Annonce 3 : iphone 15 Pro Max à 500 000 FCFA">
-            <div class="annonce-badge" aria-hidden="true">URGENT</div>
-            <button class="btn-like" type="button" aria-label="mettre en favoris" aria-pressed="false">
-                <i class="fas fa-heart" aria-hidden="true"></i>
-              </button>
-            <div class="annonce-image-wrap"><img src="0dacae7941bdf84ae61eef4f072e5d37.png" alt="Annonce iphone 13 Pro Max" loading="lazy" class="annonce-image"></div>
-            <div class="annonce-detail">
-              
-              <p class="annonce-categorie">ÉLECTRONIQUE</p>
-              <h3 class="annonce-titre">Iphone 15 Pro Max</h3>
-              <p class="annonce-description">Excellent état, batterie à 97%. Acheté en janvier 2024. Boîte originale, chargeur rapide 30W</p>
-              <p class="annonce-prix">500 000 FCFA</p>
-              <p class="annonce-localisation"> <i class="fa-solid fa-location-dot"></i>    yaoundé , cameroun  </p>
-              
-              
-              <div class="annonce-fin">
-                <p class="annonce-date"><i class="fa-regular fa-clock"></i>   Publié le 15 juin 2026</p>
-                <button class="btn" type="button" aria-label="Voir les détails">
-                  <i class="fas fa-eye" aria-hidden="true"></i>
-                </button>
-              </div>
-          </div>
-          </article>
-          <article class="annonce-card" role="listitem" aria-label="Annonce 4 : iphone 16 Pro Max à 600 000 FCFA">
-            <div class="annonce-badge" aria-hidden="true">URGENT</div>
-            <button class="btn-like" type="button" aria-label="mettre en favoris" aria-pressed="false">
-                <i class="fas fa-heart" aria-hidden="true"></i>
-              </button>
-            <div class="annonce-image-wrap"><img src="0dacae7941bdf84ae61eef4f072e5d37.png" alt="Annonce iphone 13 Pro Max" loading="lazy" class="annonce-image"></div>
-            <div class="annonce-detail">
-              
-              <p class="annonce-categorie">ÉLECTRONIQUE</p>
-              <h3 class="annonce-titre">Iphone 16 Pro Max</h3>
-              <p class="annonce-description">Excellent état, batterie à 97%. Acheté en janvier 2024. Boîte originale, chargeur rapide 30W
-              </p>
-              <p class="annonce-prix">600 000 FCFA</p>
-              <p class="annonce-localisation"> <i class="fa-solid fa-location-dot"></i>     yaoundé , cameroun </p>
-             
-              
-              <div class="annonce-fin">
-                <p class="annonce-date"><i class="fa-regular fa-clock"></i>     Publié le 15 juin 2026</p>
-                <button class="btn" type="button" aria-label="Voir les détails">
-                  <i class="fas fa-eye" aria-hidden="true"></i>
-                </button>
-              </div>
-            </div>
-          </article>
-
+                   <!-- Les cartes sont générées dynamiquement par afficherAnnonces() dans script.js -->
         </div> <!-- Ajoutez d'autres cartes d'annonces ici -->
       </section>
       <!-- /annonces -->
@@ -351,7 +271,7 @@
 
     <!-- FOOTER -->
     <footer class="footer" role="contentinfo">
-      <div class="f">
+      <div class="w">
         <div class="ftr-g">
           <div class="ftr-brand">
             <a href="index.html" class="logo" aria-label="SOKALI — Retour à l'accueil">

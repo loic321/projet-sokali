@@ -33,7 +33,7 @@
   --a2: #EAEAE6;
 
   /* Inverse — hero, footer */
-  --inv: #0F0F1C;
+  --inv:#0F0F1C;
 
   /* Bordures */
   --bd:  #E4E4DA;
@@ -169,12 +169,29 @@ p  { color: var(--t2); line-height: 1.78; }
   font-weight:     600;
   cursor:          pointer;
   white-space:     nowrap;
+  -webkit-tap-highlight-color: transparent;
   transition:
     background-color var(--tb),
     color            var(--tb),
     transform        var(--ta),
     box-shadow       var(--tb);
 }
+.btn-icon { 
+  width:44px; 
+  height:44px; 
+  border:          none;
+  border-radius:   var(--rf);
+  display:flex; 
+  background: var(--s);
+  align-items:center; 
+  justify-content:center;
+  -webkit-tap-highlight-color: transparent;
+   transition:
+    background-color var(--tb),
+    color            var(--tb),
+    transform        var(--ta),
+    box-shadow       var(--tb);
+ }
 
 .btn:disabled {
   opacity:        0.4;
@@ -263,35 +280,22 @@ p  { color: var(--t2); line-height: 1.78; }
   align-items:     center;
   gap:             0.5rem;
   font-family:     var(--fd);
-  font-size:       1rem;
+  font-size:       1.5rem;
   font-weight:     900;
   color:           var(--t1);
   flex-shrink:     0;
   text-decoration: none;
 }
 
-.logo-marque {
-  width:         36px;
-  height:        36px;
-  background:    linear-gradient(135deg, var(--p), var(--pd));
-  border-radius: var(--r2);
-  display:       flex;
-  align-items:   center;
-  justify-content: center;
-  color:         #fff;
-  font-family:   var(--fd);
-  font-weight:   900;
-  font-size:     0.95rem;
-  box-shadow:    0 2px 8px rgba(232,114,26,.35);
-}
+
 
 .logo-accent { color: var(--p); }
 
-.logo-swap { fill: var(--dark); }
+.logo-swap { fill: var(--t1); }
 .logo-seam { fill: var(--bg); }
 
 [data-theme=dark] .logo-swap { fill: var(--bg); }
-[data-theme=dark] .logo-seam { fill: var(--dark); }
+[data-theme=dark] .logo-seam { fill: var(--t1); }
 
 /* Barre de recherche */
 .search-wrapper {
@@ -347,66 +351,139 @@ p  { color: var(--t2); line-height: 1.78; }
   display:      none;   /* réactivé uniquement en media query mobile */
   background:   transparent;
   border:       none;
+  border-radius: var(--rf);
   font-size:    0.825rem;
   color:        var(--t1);
-  padding:      0.5rem;
+  padding:      0.8rem;
   flex-shrink:  0;
 }
-
-/* Menu mobile — invisible par défaut, même sur mobile, tant que .ouvert n'est pas là */
-.mobile-menu {
-  display:         none;   /* passe à flex uniquement avec la classe .ouvert */
-  flex-direction:  column;
-  gap:             0.75rem;
-  padding:         1rem 2.5rem 1.25rem;
-  background:      var(--s);
-  border-top:      1px solid var(--bd);
+.menu-toggle:hover { background: var(--a1);  }
+/* 
+   OVERLAY — fond sombre derrière le drawer
+*/
+.drawer-overlay {
+  position:        fixed;
+  inset:            0;                      /* top/right/bottom/left: 0 en une ligne */
+  background:       rgba(15, 15, 28, 0.55);
+  backdrop-filter:  blur(2px);
+  opacity:          0;
+  pointer-events:   none;    /* invisible ET non-cliquable par défaut */
+  transition:       opacity var(--tb);
+  z-index:          900;
 }
 
-/* Quand JS ajoute .ouvert au clic : le menu devient visible */
-.mobile-menu.ouvert {
-  display: flex;
+.drawer-overlay.ouvert {
+  opacity:        1;
+  pointer-events: auto;      /* redevient cliquable une fois ouvert */
 }
 
-/* Sur mobile : les boutons du menu prennent toute la largeur, plus faciles à taper */
-.mobile-menu .btn {
-  width:           100%;
-  justify-content: center;
-}
-/* Séparation visuelle entre nav et actions */
-.mobile-menu-nav {
-  display:        flex;
+/* 
+   DRAWER — panneau glissant
+*/
+.mobile-drawer {
+  position:    fixed;
+  top:         0;
+  right:       0;
+  height:      100vh;
+  width:       min(320px, 85vw);   /* jamais plus large que 85% de l'écran */
+  background:  var(--s);
+  box-shadow:  -8px 0 40px rgba(15, 15, 28, 0.25);
+  display:     flex;
   flex-direction: column;
-  border-bottom:  1px solid var(--bd);
-  padding-bottom: 0.75rem;
-  margin-bottom:  0.25rem;
+  transform:   translateX(100%);   /* caché hors écran, à droite */
+  transition:  transform 280ms cubic-bezier(.4,0,.2,1);
+  z-index:     950;                /* au-dessus de l'overlay (900) */
+  overflow-y:  auto;
 }
 
-.mobile-menu-link {
+.mobile-drawer.ouvert {
+  transform: translateX(0);        /* glisse jusqu'à sa position finale */
+}
+
+/* En-tête du drawer */
+.drawer-header {
+  display:         flex;
+  align-items:     center;
+  justify-content: space-between;
+  padding:         1.25rem 1.5rem;
+  border-bottom:   1px solid var(--bd);
+}
+
+.drawer-logo {
   display:      flex;
   align-items:  center;
-  gap:          0.75rem;
-  padding:      0.65rem 0.25rem;
+  gap:          0.5rem;
+  font-family:  var(--fd);
+  font-weight:  900;
+  font-size:    1.1rem;
   color:        var(--t1);
-  font-size:    0.9rem;
-  font-weight:  600;
-  transition:   color var(--tb);
 }
 
-.mobile-menu-link i {
+.drawer-close {
+  background:    transparent;
+  width:          2.5rem;
+  border:        none;
+  border-radius: var(--rf);
+  font-size:     1.2rem;
+  color:         var(--t2);
+  padding:       0.5rem;
+  transition:    background-color var(--tb), color var(--tb);
+}
+
+.drawer-close:hover {
+  background: var(--ps);
+  color:      var(--p);
+}
+
+/* Navigation */
+.drawer-nav {
+  display:         flex;
+  flex-direction:  column;
+  padding:         0.75rem 1rem;
+  border-bottom:   1px solid var(--bd);
+}
+
+.drawer-link {
+  display:      flex;
+  align-items:  center;
+  gap:          0.85rem;
+  padding:      0.85rem 0.75rem;
+  border-radius: var(--r1);
+  color:        var(--t1);
+  font-size:    0.92rem;
+  font-weight:  600;
+  transition:   background-color var(--tb), color var(--tb);
+}
+
+.drawer-link i {
   color:      var(--p);
   width:      18px;
   text-align: center;
+  font-size:  0.95rem;
 }
 
-.mobile-menu-link:hover {
-  color: var(--p);
+.drawer-link:hover {
+  background: var(--ps);
+  color:      var(--p);
 }
 
-.mobile-menu-actions {
+/* Actions */
+.drawer-actions {
   display:        flex;
   flex-direction: column;
   gap:            0.75rem;
+  padding:        1.25rem 1.5rem;
+  margin-top:     auto;    /* pousse ce bloc tout en bas du drawer */
+}
+
+.drawer-actions .btn {
+  width:           100%;
+  justify-content: center;
+}
+
+/* Empêche le scroll de la page derrière le drawer ouvert */
+body.drawer-ouvert {
+  overflow: hidden;
 }
 /*  HERO */
 
@@ -429,9 +506,9 @@ p  { color: var(--t2); line-height: 1.78; }
   position:       absolute;
   top:            -20%;
   right:          -5%;
-  width:          500px;
-  height:         500px;
-  background:     radial-gradient(circle, rgba(232,114,26,.15) 0%, transparent 30%);
+  width:          600px;
+  height:         600px;
+  background:     radial-gradient(circle, rgba(232, 115, 26, 0.136) 0%, transparent 60%);
   border-radius:  50%;
   pointer-events: none;
 }
@@ -444,7 +521,7 @@ p  { color: var(--t2); line-height: 1.78; }
   left:           -5%;
   width:          400px;
   height:         400px;
-  background:     radial-gradient(circle, rgba(245,197,24,.08) 0%, transparent 30%);
+  background:     radial-gradient(circle, rgba(245, 197, 24, 0.14) 0%, transparent 60%);
   border-radius:  50%;
   pointer-events: none;
 }
@@ -514,15 +591,19 @@ p  { color: var(--t2); line-height: 1.78; }
     border-bottom: rgba(94, 75, 8, 0.15) 1px solid;
 }
 
-.trust-in{
-    display: flex;
-    justify-content: center;
-    gap: 40px;
+.trust-in {
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;   /* ← ajoute ça */
+  gap: 40px;
+}
+@media (max-width: 600px) {
+  .trust-in { gap: 16px; }
 }
 .w {
     max-width: 1360px;
     margin: 0 auto;
-    padding: 0 2.5rem;
+    padding: 0 2rem;
 }
 .trust-item{
     color: var(--p);
@@ -573,14 +654,27 @@ p  { color: var(--t2); line-height: 1.78; }
 
 
 /* CATÉGORIES */
-
+.flex-container {
+  display: flex;
+  justify-content: space-between;
+  
+}
+.section-entete-right {
+  
+  margin-bottom: 2.5rem;
+  max-width:     1360px;
+  margin-left:   auto;
+  margin-right:  auto;
+}
 /* Grille */
 .categories-grille {
-  display:               grid;
-  grid-template-columns: repeat(7, 1fr);
-  gap:                   1rem;
-  max-width:             1360px;
-  margin:                0 auto;
+  display: grid;
+  /* Même logique fluide, avec un minimum plus petit
+     car les catégories sont plus étroites que les cartes d'annonces */
+  grid-template-columns: repeat(auto-fill, minmax(110px, 1fr));
+  gap: 1rem;
+  max-width: 1360px;
+  margin: 0 auto;
 }
 
 /* Carte */
@@ -624,6 +718,7 @@ p  { color: var(--t2); line-height: 1.78; }
 .filtre {
     display: flex;
     justify-content: flex-end;
+    height: 2.3rem;
 }
 
 /* État actif — filtre sélectionné */
@@ -651,37 +746,50 @@ p  { color: var(--t2); line-height: 1.78; }
   transition: background-color var(--tb), color var(--tb);
 }
 
-.categorie-nom   { font-size: 0.78rem; font-weight: 700; color: var(--t1); line-height: 1.3; }
+.categorie-nom {
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: var(--t1);
+  line-height: 1.3;
+  /* Réserve toujours l'espace de 2 lignes, wrap ou pas,
+     pour que toutes les cartes d'une même rangée aient la même hauteur */
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  min-height: calc(1.3 * 0.78rem * 2);
+}
 .categorie-count { font-size: 0.68rem; color: var(--t3); }
 
 /* ANNONCES */
 /* Mobile d'abord (par défaut) */
+
+
 .annonce-grille {
   display: grid;
-  grid-template-columns: 1fr;
-  gap: 16px;
-  padding: 0;
+  /* Grille fluide : le nombre de colonnes s'adapte automatiquement.
+     Chaque carte fait au moins 270px, jamais moins → passe naturellement
+     par 4 / 3 / 2 / 1 colonnes selon la largeur disponible. */
+  grid-template-columns: repeat(auto-fill, minmax(270px, 1fr));
+  gap: 20px;
   margin-top: 20px;
 }
 
-@media (min-width: 768px) {
-  .annonce-grille {
-    grid-template-columns: repeat(2, 1fr);
-  }
+/* Garde-fous sur les seuils critiques (comme dans sokali_v5) :
+   au cas où minmax() donnerait un résultat limite indésirable */
+@media (max-width: 860px) {
+  .annonce-grille { grid-template-columns: repeat(2, 1fr); gap: 1rem; }
+}
+@media (max-width: 480px) {
+  .annonce-grille { grid-template-columns: 1fr; gap: .875rem; }
 }
 
-@media (min-width: 1024px) {
-  .annonce-grille {
-    grid-template-columns: repeat(4, 1fr);
-    gap: 20px;
-  }
-}
 .annonce-badge{
   position: absolute;
   letter-spacing: 0.6px;
   top: 16px;
   left: 16px;
-  background-color: var(--p);
+  background-color: var(--g);
   color: #fff;
   font-size: 0.71rem;
   font-weight: bold;
@@ -892,7 +1000,7 @@ p  { color: var(--t2); line-height: 1.78; }
   height:     56px;
   box-shadow: var(--s1);
 }
-.header.scrolled .logo-marque { transform: scale(0.9); }
+.header.scrolled .logo { transform: scale(0.9); }
 
 /* --- Apparition progressive au scroll (cartes, catégories) --- */
 .categorie-item,
@@ -944,43 +1052,36 @@ p  { color: var(--t2); line-height: 1.78; }
 .footer {
   background: var(--inv);
   color:      rgba(255,255,255,.45);
-  display:    flex;
-  gap:        2rem;
-  padding:    4rem 0 1.5rem 6rem;
+  display: flex;
+  padding:    4rem 0 0 ;
   font-size:  0.875rem;
 }
 
 .footer-soka {  color: #fff; }
 .footer-soka .logo-accent { color: var(--p); }
-.ftr{background:var(--inv);color:#fff;padding:4rem 0 0}
-.ftr-g{display:grid;grid-template-columns:2fr 1fr 1fr 1fr;gap:8rem;padding-bottom:3rem;padding-right: 5.5rem;   border-bottom:1px solid rgba(255,255,255,.08)}
+.ftr-g{display:grid;grid-template-columns:2fr 1fr 1fr 1fr;gap:3rem;padding-bottom:3rem;border-bottom:1px solid rgba(255,255,255,.08)}
 @media(max-width:1024px){.ftr-g{grid-template-columns:repeat(2,1fr)}}
 @media(max-width:600px){.ftr-g{grid-template-columns:1fr}}
 .ftr-brand .logo{color:#fff;margin-bottom:1rem}
 .ftr-brand p{color:rgba(255,255,255,.5);font-size:.875rem;line-height:1.82;max-width:32ch;margin-bottom:1.25rem}
+.ftr-brand {padding-right: 5rem}
+.ftr-col{padding-right:5.5rem}
 .soc-links{display:flex;gap:.625rem}
 .soc-a{width:38px;height:38px;border-radius:50%;background:rgba(255,255,255,.08);display:flex;align-items:center;justify-content:center;color:#fff;font-size:.84rem;transition:background-color var(--ta),transform var(--ta)}
 .soc-a:hover{background:var(--p);transform:translateY(-3px)}.soc-a:active{transform:scale(.92)}
 .ftr-col h5{font-size:.75rem;font-weight:700;text-transform:uppercase;letter-spacing:.09em;color:rgba(255,255,255,.3);margin-bottom:1rem}
 .ftr-col a{display:block;color:rgba(255,255,255,.52);font-size:.875rem;padding:.3rem 0;transition:color var(--ta);}.ftr-col a:hover{color:var(--p);padding-left:5px}
-.ftr-bt{padding:1.5rem 0 0 0;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:.5rem}
+.ftr-bt{padding:1.5rem 0;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:.5rem}
 .ftr-bt p,.ftr-bt a{color:rgba(255,255,255,.28);font-size:.75rem}
 .ftr-bt-lk{display:flex;gap:1.25rem}.ftr-bt-lk a{transition:color var(--ta)}.ftr-bt-lk a:hover{color:rgba(255,255,255,.7)}
 /*  MEDIA QUERIES */
 
-/* Tablette large */
-@media (max-width: 1100px) {
-  .categories-grille { grid-template-columns: repeat(5, 1fr); }
-}
 
 /* Tablette */
 @media (max-width: 1000px) {
   .search-wrapper { max-width: 260px; }
 }
 
-@media (max-width: 800px) {
-  .categories-grille { grid-template-columns: repeat(4, 1fr); gap: 0.75rem; }
-}
 
 /* Mobile */
 @media (max-width: 768px) {
@@ -991,7 +1092,6 @@ p  { color: var(--t2); line-height: 1.78; }
 }
 
 @media (max-width: 480px) {
-  .categories-grille { grid-template-columns: repeat(4, 1fr); gap: 0.5rem; }
   .hero              { padding: 3rem 1.25rem; }
   .hero-ctas         { flex-direction: column; align-items: center; }
   .hero-ctas .btn    { width: 100%; max-width: 320px; }
@@ -1003,7 +1103,6 @@ p  { color: var(--t2); line-height: 1.78; }
 
 /* Très petit mobile */
 @media (max-width: 360px) {
-  .categories-grille { grid-template-columns: repeat(3, 1fr); }
   .search-wrapper { display: none; }
   .nav-actions    { display: none; }   /* les boutons desktop disparaissent */
   .menu-toggle    { display: flex; align-items: center; justify-content: center; }
