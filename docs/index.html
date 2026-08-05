@@ -1,292 +1,581 @@
 <!DOCTYPE html>
-<html lang="fr" data-theme="light" class="no-js"> <!--pour plus tard-->  
-
-  <!--HEAD-->
+<html lang="fr" data-theme="light" class="no-js">
   <head>
-
     <meta charset="UTF-8">
-    <meta name="viewport"    content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
     <meta name="description" content="SOKALI — La marketplace locale N°1 en Afrique. Achetez et vendez près de chez vous.">
-    <meta name="theme-color" content="#E8721A">
-
-    <!-- Open Graph -->
-    <meta property="og:title"       content="SOKALI | Marketplace locale">
+    <meta name="theme-color" content="#F26522">
+    <meta property="og:title" content="SOKALI | Marketplace locale">
     <meta property="og:description" content="Des milliers d'annonces. Vends en 2 minutes.">
-    <meta property="og:type"        content="website">
+    <meta property="og:type" content="website">
 
-    <!-- Fonts — preconnect d'abord, import ensuite -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,700;9..144,900&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
-
-    <!-- Icônes -->
+    <link href="https://fonts.googleapis.com/css2?family=Sora:wght@600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 
-    <link rel="icon" type="image/svg+xml" href="assets/sokali-icon.svg">
-    <!-- Styles -->
     <link rel="stylesheet" href="style.css">
     <script src="script.js" defer></script>
 
     <title>SOKALI | La marketplace locale N°1 en Afrique</title>
- </head>
-  
+  </head>
+  <body>
 
+    <a href="#main" class="skip">Aller au contenu principal</a>
+    <div class="nstk" id="nstk" aria-live="polite" aria-atomic="false"></div>
 
-  <!-- BODY -->
-  <body> 
-    <!--  HEADER  -->
+    <!-- ══════════ HEADER ══════════
+     Plus de bouton retour ici : chaque vue qui en a besoin porte le sien,
+     au bon endroit pour CETTE vue (fil d'Ariane, lien dans une sidebar,
+     icône de fermeture...). Un bouton retour générique dans le header
+     n'a de sens nulle part en particulier — c'est pour ça qu'il "flottait"
+     bizarrement. Voir plus bas dans chaque vue pour son équivalent local. -->
     <header class="header">
-
       <nav class="nav" aria-label="Navigation principale">
-
-        <!-- Logo -->
-         <a href="index.html" class="logo" aria-label="SOKALI — Retour à l'accueil">
-          <svg viewBox="80 60 700 240" width="140" height="45" role="img" aria-hidden="true">
+        <a href="#" class="logo" id="logoLink" aria-label="SOKALI — Retour à l'accueil">
+          <svg class="logo-mark" viewBox="80 60 700 240" width="93" height="32" role="img" aria-label="Sokali">
             <defs>
-              <clipPath id="sk-u"><polygon points="108,85 252,85 252,194 108,155"/></clipPath>
-              <clipPath id="sk-l"><polygon points="108,155 252,194 252,255 108,255"/></clipPath>
+              <clipPath id="sokali-upper-lk-hdr">
+                <polygon points="108,85 252,85 252,194 108,155" />
+              </clipPath>
+              <clipPath id="sokali-lower-lk-hdr">
+                <polygon points="108,155 252,194 252,255 108,255" />
+              </clipPath>
             </defs>
             <g transform="rotate(-7,180,170)">
-              <text x="120" y="242" font-family="Fraunces, serif" font-size="200" font-weight="900" clip-path="url(#sk-u)" fill="#E8721A">S</text>
-              <text x="120" y="242" font-family="Fraunces, serif" font-size="200" font-weight="900" clip-path="url(#sk-l)" class="logo-swap">S</text>
-              <polygon points="180,163 191,174.5 180,186 169,174.5" class="logo-seam"/>
+              <text x="120" y="242" font-family="SokaliDisplay, Georgia, serif" font-size="200" font-weight="900" clip-path="url(#sokali-upper-lk-hdr)" fill="#E8721A">S</text>
+              <text x="120" y="242" font-family="SokaliDisplay, Georgia, serif" font-size="200" font-weight="900" clip-path="url(#sokali-lower-lk-hdr)" fill="#1A1A2E">S</text>
+              <polygon points="180,163 191,174.5 180,186 169,174.5" fill="#FDFAF5" />
             </g>
-            <text x="255" y="242" font-family="Fraunces, serif" font-size="200" font-weight="900" letter-spacing="-4" class="logo-swap">oka<tspan fill="#E8721A">li</tspan></text>
+            <text x="255" y="242" font-family="SokaliDisplay, Georgia, serif" font-size="200" font-weight="900" letter-spacing="-4" fill="#1A1A2E">oka<tspan fill="#E8721A">li</tspan></text>
           </svg>
         </a>
 
-        <!-- Recherche -->
-        <div class="search-wrapper" role="search">
-          <i class="fas fa-search" aria-hidden="true"></i>
-          <input
-            class="search-input"
-            type="search"
-            placeholder="Que recherchez-vous ?"
-            autocomplete="off"
-            aria-label="Rechercher des annonces"
-          >
+        <div class="nav-center">
+          <button class="search-trigger" id="searchTrigger" type="button" aria-haspopup="dialog" aria-controls="searchOverlay">
+            <i class="fas fa-search" aria-hidden="true"></i>
+            <span>Rechercher une annonce, une ville…</span>
+          </button>
         </div>
 
-        <!-- Actions -->
         <div class="nav-actions">
-          <button class="btn btn-orange" type="button">
-            <i class="fas fa-plus" aria-hidden="true"></i>
-            Publier
+          <!-- Icône recherche : visible seulement sur mobile, remplace l'ancienne
+           barre persistante qui entrait en conflit avec le reste du header. -->
+          <button class="btn-icon show-m" id="searchIconBtn" aria-label="Rechercher">
+            <i class="fas fa-search" aria-hidden="true"></i>
           </button>
-          <button class="btn btn-vert" type="button">
-            <i class="fas fa-user" aria-hidden="true"></i>
-            Se connecter
+          <button class="btn-icon" id="themeBtn" aria-label="Activer le mode sombre" aria-pressed="false">
+            <i class="fas fa-moon" aria-hidden="true"></i>
+          </button>
+          <button class="btn-icon hide-m" id="favBtn" aria-label="Mes favoris">
+            <i class="far fa-heart" aria-hidden="true"></i>
+            <span class="dot-bdg" id="favDot" style="display:none" aria-hidden="true"></span>
+          </button>
+          <button class="btn-icon hide-m" id="msgBtn" aria-label="Mes messages">
+            <i class="far fa-envelope" aria-hidden="true"></i>
+            <span class="cnt-bdg" id="msgBdg" style="display:none" aria-hidden="true">0</span>
+          </button>
+          <button class="btn btn-orange hide-m" id="pubBtn" style="padding:.6rem 1.1rem">
+            <i class="fas fa-plus" aria-hidden="true"></i> Publier
+          </button>
+          <button class="btn-icon hide-m" id="userBtn" aria-label="Se connecter">
+            <i class="fas fa-user" aria-hidden="true" id="userIcon"></i>
+          </button>
+          <button class="menu-toggle" id="mobTog" aria-label="Ouvrir le menu" aria-expanded="false" aria-controls="mobileDrawer">
+            <i class="fas fa-bars" aria-hidden="true"></i>
           </button>
         </div>
-        <button class="menu-toggle" aria-label="Ouvrir le menu" aria-expanded="false" aria-controls="mobileMenu">
-          <i class="fas fa-bars"></i>
-        </button>
-
       </nav>
-
     </header>
-    <!-- /header -->
 
-
-    <!--MAIN  -->
-    <main>
-        <!-- Overlay : fond sombre derrière le drawer -->
-        <div class="drawer-overlay" id="drawerOverlay"></div>
-        <!-- Drawer : panneau qui glisse depuis la droite -->
-        <aside class="mobile-drawer" id="mobileDrawer" role="dialog" aria-modal="true" aria-label="Menu de navigation">
-
-          <!-- En-tête du drawer : logo + bouton fermer -->
-          <div class="drawer-header">
-            <div class="drawer-logo">
-              <span>SOKA<span class="logo-accent">LI</span></span>
-            </div>
-            <button class="drawer-close" type="button" id="drwClose" aria-label="Fermer le menu">
-              <i class="fas fa-times" aria-hidden="true"></i>
-            </button>
-          </div>
-
-          <!-- Navigation -->
-          <nav class="drawer-nav" aria-label="Navigation mobile">
-            <a href="#" class="drawer-link">
-              <i class="fas fa-home" aria-hidden="true"></i> Accueil
-            </a>
-            <a href="#" class="drawer-link">
-              <i class="fas fa-heart" aria-hidden="true"></i> Mes favoris
-            </a>
-            <a href="#" class="drawer-link">
-              <i class="fas fa-comment-dots" aria-hidden="true"></i> Messages
-            </a>
-            <a href="#" class="drawer-link">
-              <i class="fas fa-user-circle" aria-hidden="true"></i> Mon profil
-            </a>
-          </nav>
-
-          <!-- Actions principales -->
-          <div class="drawer-actions">
-            <button class="btn btn-orange" type="button">
-              <i class="fas fa-plus" aria-hidden="true"></i>
-              Publier une annonce
-            </button>
-            <button class="btn btn-vert" type="button">
-              <i class="fas fa-user" aria-hidden="true"></i>
-              Se connecter
-            </button>
-          </div>
-
-        </aside>
-      <!-- SECTION : HERO  -->
-      <section class="hero" aria-labelledby="hero-titre">
-
-        <!-- Badge -->
-        <div class="hero-badge">
-          <span class="hero-badge-dot" aria-hidden="true"></span>
-          La marketplace locale N°1 en Afrique
+    <!-- ══════════ OVERLAY DE RECHERCHE (style Spotlight) ══════════ -->
+    <div class="search-overlay" id="searchOverlay" role="dialog" aria-modal="true" aria-label="Rechercher" aria-hidden="true">
+      <div class="search-overlay-panel">
+        <div class="search-overlay-input-row">
+          <i class="fas fa-search" aria-hidden="true"></i>
+          <input type="search" id="overlayInput" placeholder="Rechercher une annonce, une ville…" autocomplete="off" aria-label="Rechercher">
+          <button class="btn-icon" id="searchOverlayClose" aria-label="Fermer la recherche"><i class="fas fa-times" aria-hidden="true"></i></button>
         </div>
-
-        <!-- Titre principal -->
-        <h1 id="hero-titre">
-          Achète. Vends.<br>
-          Localement avec <span class="gradient-texte">SOKALI</span>.
-        </h1>
-
-        <!-- Description -->
-        <p class="hero-description">
-          Des milliers d'annonces près de chez toi. Trouve le bon deal ou vends
-          en 2 minutes — directement entre particuliers, en toute confiance.
-        </p>
-
-        <!-- Boutons -->
-        <div class="hero-ctas">
-          <button class="btn btn-orange btn-large" type="button">
-            <i class="fas fa-plus-circle" aria-hidden="true"></i>
-            Publier une annonce
-          </button>
-          <button class="btn btn-verre btn-large" type="button">
-            <i class="fas fa-compass" aria-hidden="true"></i>
-            Explorer les annonces
-          </button>
+        <div class="search-overlay-section">
+          <h4>Recherches récentes</h4>
+          <div class="search-chip-list" id="recentList"></div>
         </div>
+        <div class="search-overlay-section">
+          <h4>Catégories populaires</h4>
+          <div class="search-chip-list" id="popularCats"></div>
+        </div>
+      </div>
+    </div>
 
-      </section>
+    <!-- ══════════ DRAWER MOBILE ══════════ -->
+    <div class="drawer-overlay" id="drawerOverlay"></div>
 
-      <div class="trust-bar">
-         <div class="trust-in w">
+    <!-- ══════════ PANNEAU DE FILTRES ══════════
+     Même mécanique de tiroir que le menu mobile (overlay + panneau qui
+     glisse depuis la droite), réutilisée pour un contenu différent :
+     tri, fourchette de prix, état de l'article. -->
+    <div class="drawer-overlay" id="filterOverlay"></div>
+    <aside class="filter-panel" id="filterPanel" role="dialog" aria-modal="true" aria-label="Filtres et tri" aria-hidden="true">
+      <div class="drawer-header">
+        <h3 style="margin:0">Filtrer &amp; trier</h3>
+        <button class="drawer-close" id="filterClose" aria-label="Fermer les filtres"><i class="fas fa-times" aria-hidden="true"></i></button>
+      </div>
+      <div class="filter-bd">
+        <div class="filter-sec">
+          <h4>Trier par</h4>
+          <div class="chip-row" id="sortChips">
+            <button class="chip on" data-sort="recent" type="button">Plus récent</button>
+            <button class="chip" data-sort="price-asc" type="button">Prix croissant</button>
+            <button class="chip" data-sort="price-desc" type="button">Prix décroissant</button>
+          </div>
+        </div>
+        <div class="filter-sec">
+          <h4>Prix (FCFA)</h4>
+          <div class="price-range-row">
+            <input type="number" id="fMin" class="inp" placeholder="Min" min="0">
+            <span aria-hidden="true">—</span>
+            <input type="number" id="fMax" class="inp" placeholder="Max" min="0">
+          </div>
+        </div>
+        <div class="filter-sec">
+          <h4>État de l'article</h4>
+          <div class="chip-row" id="condChips">
+            <button class="chip on" data-cond="" type="button">Tous</button>
+            <button class="chip" data-cond="Neuf" type="button">Neuf</button>
+            <button class="chip" data-cond="Très bon" type="button">Très bon</button>
+            <button class="chip" data-cond="Bon" type="button">Bon</button>
+          </div>
+        </div>
+      </div>
+      <div class="filter-ft">
+        <button class="btn btn-ghost" id="filterReset" type="button">Réinitialiser</button>
+        <button class="btn btn-orange" id="filterApply" type="button">Appliquer</button>
+      </div>
+    </aside>
+    <aside class="mobile-drawer" id="mobileDrawer" role="dialog" aria-modal="true" aria-label="Menu de navigation">
+      <div class="drawer-header">
+        <div class="drawer-logo">
+          <svg viewBox="80 60 700 240" width="76" height="26" role="img" aria-label="Sokali">
+            <defs>
+              <clipPath id="sokali-upper-lk-drw">
+                <polygon points="108,85 252,85 252,194 108,155" />
+              </clipPath>
+              <clipPath id="sokali-lower-lk-drw">
+                <polygon points="108,155 252,194 252,255 108,255" />
+              </clipPath>
+            </defs>
+            <g transform="rotate(-7,180,170)">
+              <text x="120" y="242" font-family="SokaliDisplay, Georgia, serif" font-size="200" font-weight="900" clip-path="url(#sokali-upper-lk-drw)" fill="#E8721A">S</text>
+              <text x="120" y="242" font-family="SokaliDisplay, Georgia, serif" font-size="200" font-weight="900" clip-path="url(#sokali-lower-lk-drw)" fill="#1A1A2E">S</text>
+              <polygon points="180,163 191,174.5 180,186 169,174.5" fill="#FDFAF5" />
+            </g>
+            <text x="255" y="242" font-family="SokaliDisplay, Georgia, serif" font-size="200" font-weight="900" letter-spacing="-4" fill="#1A1A2E">oka<tspan fill="#E8721A">li</tspan></text>
+          </svg>
+        </div>
+        <button class="drawer-close" id="drwClose" aria-label="Fermer le menu"><i class="fas fa-times" aria-hidden="true"></i></button>
+      </div>
+      <nav class="drawer-nav" aria-label="Navigation mobile">
+        <a href="#" class="drawer-link" data-nav="home"><i class="fas fa-home" aria-hidden="true"></i> Accueil</a>
+        <a href="#" class="drawer-link" id="drwFav"><i class="fas fa-heart" aria-hidden="true"></i> Mes favoris</a>
+        <a href="#" class="drawer-link" data-nav="msgs"><i class="fas fa-comment-dots" aria-hidden="true"></i> Messages</a>
+        <a href="#" class="drawer-link" id="drwProfile"><i class="fas fa-user-circle" aria-hidden="true"></i> Mon profil</a>
+      </nav>
+      <div class="drawer-actions">
+        <button class="btn btn-orange" id="drwPub"><i class="fas fa-plus" aria-hidden="true"></i> Publier une annonce</button>
+        <button class="btn btn-vert" id="drwAuth"><i class="fas fa-user" aria-hidden="true"></i> <span id="drwAuthTxt">Se connecter</span></button>
+      </div>
+    </aside>
+
+    <main id="main">
+
+      <!-- ═══════════════════════ VUE : ACCUEIL ═══════════════════════ -->
+      <div class="view on" id="vHome">
+
+        <section class="hero" aria-labelledby="hero-titre">
+          <div class="hero-orb" aria-hidden="true"></div>
+          <div class="hero-badge"><span class="hero-badge-dot" aria-hidden="true"></span> La marketplace locale N°1 en Afrique</div>
+          <h1 id="hero-titre">Achète. Vends. <span class="gradient-texte">Localement avec SOKALI.</span></h1>
+          <p class="hero-description">Des milliers d'annonces près de chez toi. Trouve le bon deal ou vends en 2 minutes — directement entre particuliers, en toute confiance.</p>
+          <div class="hero-ctas">
+            <button class="btn btn-orange btn-large" id="heroPubBtn"><i class="fas fa-plus-circle" aria-hidden="true"></i> Publier une annonce</button>
+            <button class="btn btn-verre btn-large" id="heroExploreBtn"><i class="fas fa-compass" aria-hidden="true"></i> Explorer</button>
+          </div>
+        </section>
+
+        <div class="trust-bar">
+          <div class="trust-in w">
             <div class="trust-item"><i class="fas fa-shield-alt" aria-hidden="true"></i><span>Vendeurs vérifiés</span></div>
             <div class="trust-item"><i class="fas fa-bolt" aria-hidden="true"></i><span>Vente en 2 minutes</span></div>
             <div class="trust-item"><i class="fas fa-map-marker-alt" aria-hidden="true"></i><span>Annonces locales</span></div>
             <div class="trust-item"><i class="fas fa-comment-dots" aria-hidden="true"></i><span>Chat intégré</span></div>
             <div class="trust-item"><i class="fas fa-star" aria-hidden="true"></i><span>98% de satisfaction</span></div>
-         </div>
-      </div>
-      <!-- /hero -->
-
-
-      <!--  SECTION : CATÉGORIES  -->
-      <section class="categories" aria-labelledby="categories-titre">
-
-        <!-- En-tête de section -->
-        <div class="section-entete">
-          <h2 id="categories-titre" >Toutes les catégories</h2>
-          <p class="section-sous-titre">Explorez par univers</p>
+          </div>
         </div>
 
-        <!-- Grille -->
-        <div class="categories-grille" role="list">
+        <div class="cat-pills-bar" id="catPillsBar" role="list" aria-label="Catégories"></div>
 
-          <button class="categorie-item" type="button" role="listitem" aria-label="Électronique — 8 420 annonces">
-            <div class="categorie-icone" aria-hidden="true"><i class="fas fa-mobile-alt"></i></div>
-            <span class="categorie-nom">Électronique</span>
-            <span class="categorie-count">8 420 annonces</span>
-          </button>
-
-          <button class="categorie-item" type="button" role="listitem" aria-label="Véhicules — 5 180 annonces">
-            <div class="categorie-icone" aria-hidden="true"><i class="fas fa-car"></i></div>
-            <span class="categorie-nom">Véhicules</span>
-            <span class="categorie-count">5 180 annonces</span>
-          </button>
-
-          <button class="categorie-item" type="button" role="listitem" aria-label="Immobilier — 4 310 annonces">
-            <div class="categorie-icone" aria-hidden="true"><i class="fas fa-home"></i></div>
-            <span class="categorie-nom">Immobilier</span>
-            <span class="categorie-count">4 310 annonces</span>
-          </button>
-
-          <button class="categorie-item" type="button" role="listitem" aria-label="Mode — 6 750 annonces">
-            <div class="categorie-icone" aria-hidden="true"><i class="fas fa-tshirt"></i></div>
-            <span class="categorie-nom">Mode</span>
-            <span class="categorie-count">6 750 annonces</span>
-          </button>
-
-          <button class="categorie-item" type="button" role="listitem" aria-label="Maison — 3 200 annonces">
-            <div class="categorie-icone" aria-hidden="true"><i class="fas fa-couch"></i></div>
-            <span class="categorie-nom">Maison</span>
-            <span class="categorie-count">3 200 annonces</span>
-          </button>
-
-          <button class="categorie-item" type="button" role="listitem" aria-label="Services — 2 840 annonces">
-            <div class="categorie-icone" aria-hidden="true"><i class="fas fa-briefcase"></i></div>
-            <span class="categorie-nom">Services</span>
-            <span class="categorie-count">2 840 annonces</span>
-          </button>
-
-          <button class="categorie-item" type="button" role="listitem" aria-label="Loisirs — 1 900 annonces">
-            <div class="categorie-icone" aria-hidden="true"><i class="fas fa-gamepad"></i></div>
-            <span class="categorie-nom">Loisirs</span>
-            <span class="categorie-count">1 900 annonces</span>
-          </button>
-
-        </div>
-        <!-- /categories-grille -->
-
-      </section>
-      <!-- /categories -->
-
-
-      <!-- SECTION : ANNONCES  -->
-      <section class="annonce" aria-labelledby="annonce-titre">
-
-        <div class="section-entete-right">
+        <section class="annonce" id="adsSec" aria-labelledby="annonce-titre">
+          <div class="section-entete-right">
             <div class="flex-container">
               <div>
-                <h2 id="annonce-titre" >Annonces à la une</h2>
-                <p class="section-sous-titre">Les meilleures offres du moment</p> 
+                <h2 id="annonce-titre">Annonces à la une</h2>
+                <p class="section-sous-titre" id="lstCt" aria-live="polite">Les meilleures offres du moment</p>
               </div>
               <div class="filtre">
-                <button class="btn btn-filtre" type="button"> <i class="fas fa-sliders-h" aria-hidden="true"></i> Filtrer & Trier </button>
+                <button class="btn btn-filtre" id="filterBtn" type="button">
+                  <i class="fas fa-sliders-h" aria-hidden="true"></i> Filtres
+                  <span class="filtre-count" id="filterCount" style="display:none">0</span>
+                </button>
               </div>
             </div>
           </div>
-       
-        <!-- grille de cards -->
-        <div class="annonce-grille" role="list">
-                   <!-- Les cartes sont générées dynamiquement par afficherAnnonces() dans script.js -->
-        </div> <!-- Ajoutez d'autres cartes d'annonces ici -->
-      </section>
-      <!-- /annonces -->
+          <div class="annonce-grille" id="adsGrid" role="list"></div>
+        </section>
+      </div>
 
+      <!-- ═══════════════════════ VUE : RÉSULTATS DE RECHERCHE ═══════════════════════ -->
+      <div class="view" id="vSearch">
+        <div class="w">
+          <nav class="bc" aria-label="Fil d'Ariane">
+            <a href="#" data-nav="home"><i class="fas fa-arrow-left" aria-hidden="true"></i> Accueil</a>
+          </nav>
+          <div class="search-results-header">
+            <h2>Résultats pour « <span id="srchQ"></span> »</h2>
+            <p class="section-sous-titre" id="srchCount"></p>
+          </div>
+          <div class="annonce-grille" id="srchGrid" role="list"></div>
+        </div>
+      </div>
+
+      <!-- ═══════════════════════ VUE : PRODUIT ═══════════════════════ -->
+      <div class="view" id="vProduct">
+        <div class="w pv">
+          <nav class="bc" aria-label="Fil d'Ariane">
+            <a href="#" data-nav="home"><i class="fas fa-arrow-left" aria-hidden="true"></i> Accueil</a>
+            <span aria-hidden="true">›</span><span id="bcCat"></span>
+            <span aria-hidden="true">›</span><span class="bc-cur" id="bcTtl"></span>
+          </nav>
+          <div class="p-lay">
+            <div>
+              <div class="gal-main">
+                <img id="galImg" src="" alt="">
+                <div class="gal-verif" id="galVerif" style="display:none"><i class="fas fa-shield-check" aria-hidden="true"></i> Photos vérifiées par SOKALI</div>
+              </div>
+              <div class="gal-tbs" id="galTbs" role="list" aria-label="Galerie photos"></div>
+
+              <div class="p-cat" id="pCat"></div>
+              <h1 class="p-ttl" id="pTtl"></h1>
+              <div class="p-prc" id="pPrc"></div>
+              <div class="p-meta" id="pMeta"></div>
+              <h4 style="margin-bottom:.75rem">Description</h4>
+              <p class="p-desc-txt" id="pDesc"></p>
+
+              <div class="p-specs" id="pSpecs"></div>
+            </div>
+            <div class="sbar">
+              <div class="sbar-c">
+                <div class="sbar-prc" id="sPrc"></div>
+                <div class="sbar-bts">
+                  <button class="btn btn-orange" id="contactBtn" type="button">
+                    <i class="fas fa-comment-dots" aria-hidden="true"></i> Contacter le vendeur
+                  </button>
+                  <button class="btn btn-ghost" id="sFavBtn"><i class="fas fa-heart" aria-hidden="true"></i> Ajouter aux favoris</button>
+                </div>
+              </div>
+              <div class="sel-c" id="selC" tabindex="0" role="button" aria-label="Voir le profil du vendeur">
+                <div class="sel-c-t">Vendeur</div>
+                <div class="sel-row">
+                  <div class="sel-av" id="selAv"></div>
+                  <div>
+                    <div class="sel-nm" id="selNm"></div>
+                    <div class="sel-si"><i class="fas fa-check-circle" style="color:var(--ok)" aria-hidden="true"></i> <span id="selSi"></span></div>
+                  </div>
+                  <i class="fas fa-chevron-right" style="margin-left:auto;color:var(--t3);font-size:.8rem" aria-hidden="true"></i>
+                </div>
+                <div class="sel-sts" id="selSts"></div>
+              </div>
+            </div>
+          </div>
+
+          <div class="sim-sec" id="simSec">
+            <h3>Annonces similaires</h3>
+            <div class="sim-scrl" id="simList" role="list"></div>
+          </div>
+        </div>
+
+        <!-- Barre sticky mobile : remplace le dock principal pendant la consultation -->
+        <div class="product-sticky-bar" id="productStickyBar">
+          <span class="psb-prix" id="psbPrc"></span>
+          <button class="btn btn-orange" id="psbContactBtn" type="button">
+            <i class="fas fa-comment-dots" aria-hidden="true"></i> Contacter
+          </button>
+        </div>
+      </div>
+
+      <!-- ═══════════════════════ VUE : AUTH ═══════════════════════ -->
+      <div class="view" id="vAuth">
+        <div class="auth-lay">
+          <div class="auth-l">
+            <a href="#" data-nav="home" class="auth-l-back"><i class="fas fa-arrow-left" aria-hidden="true"></i> Accueil</a>
+            <div class="auth-l-cnt">
+              <h2>Rejoins des milliers de vendeurs</h2>
+              <p>Crée ton compte SOKALI et commence à vendre ou acheter en quelques minutes.</p>
+              <div class="auth-feats">
+                <div class="auth-ft">
+                  <div class="auth-ft-ic"><i class="fas fa-bolt" aria-hidden="true"></i></div><span>Publier en moins de 2 minutes</span>
+                </div>
+                <div class="auth-ft">
+                  <div class="auth-ft-ic"><i class="fas fa-shield-alt" aria-hidden="true"></i></div><span>Transactions sécurisées</span>
+                </div>
+                <div class="auth-ft">
+                  <div class="auth-ft-ic"><i class="fas fa-comment-dots" aria-hidden="true"></i></div><span>Chat intégré</span>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="auth-r">
+            <div class="auth-box">
+              <div class="a-tabs">
+                <button class="atab on" data-tab="aLogin">Se connecter</button>
+                <button class="atab" data-tab="aReg">Créer un compte</button>
+              </div>
+              <div class="apn on" id="aLogin">
+                <div class="soc-bts">
+                  <button class="soc-bt" id="socGoogle" type="button"><i class="fab fa-google" aria-hidden="true"></i> Google</button>
+                  <button class="soc-bt" id="socFb" type="button"><i class="fab fa-facebook-f" aria-hidden="true"></i> Facebook</button>
+                </div>
+                <div class="a-sep"><span>ou par email</span></div>
+                <div class="fld"><label for="lEmail">Email</label><input type="email" id="lEmail" class="inp" placeholder="vous@exemple.com"></div>
+                <div class="fld"><label for="lPwd">Mot de passe</label><input type="password" id="lPwd" class="inp" placeholder="••••••••"></div>
+                <button class="btn btn-orange" style="width:100%;justify-content:center" id="doLoginBtn">Se connecter</button>
+              </div>
+              <div class="apn" id="aReg">
+                <div class="fld"><label for="rNm">Nom complet</label><input type="text" id="rNm" class="inp" placeholder="Jean-Kevin Mbeki"></div>
+                <div class="fld"><label for="rEm">Email</label><input type="email" id="rEm" class="inp" placeholder="vous@exemple.com"></div>
+                <div class="fld"><label for="rPwd">Mot de passe</label><input type="password" id="rPwd" class="inp" placeholder="Min. 8 caractères"></div>
+                <button class="btn btn-orange" style="width:100%;justify-content:center" id="doRegBtn">Créer mon compte</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ═══════════════════════ VUE : PUBLIER (wizard 4 étapes) ═══════════════════════ -->
+      <div class="view" id="vPublish">
+        <div class="pub-wrap">
+          <div class="w">
+            <div class="pub-lay">
+              <div class="pub-sb">
+                <h3>Étapes de publication</h3>
+                <div class="pub-steps">
+                  <div class="ps-it act" id="ps1">
+                    <div class="ps-num">1</div>
+                    <div>
+                      <div class="ps-lbl">Étape 1</div>
+                      <div class="ps-ttl">Catégorie &amp; Titre</div>
+                    </div>
+                  </div>
+                  <div class="ps-it" id="ps2">
+                    <div class="ps-num">2</div>
+                    <div>
+                      <div class="ps-lbl">Étape 2</div>
+                      <div class="ps-ttl">Prix &amp; Description</div>
+                    </div>
+                  </div>
+                  <div class="ps-it" id="ps3">
+                    <div class="ps-num">3</div>
+                    <div>
+                      <div class="ps-lbl">Étape 3</div>
+                      <div class="ps-ttl">Photo &amp; Localisation</div>
+                    </div>
+                  </div>
+                  <div class="ps-it" id="ps4">
+                    <div class="ps-num">4</div>
+                    <div>
+                      <div class="ps-lbl">Étape 4</div>
+                      <div class="ps-ttl">Vérification</div>
+                    </div>
+                  </div>
+                </div>
+                <div class="pub-prog">
+                  <div class="pub-prog-f" id="pubProgF" style="width:25%"></div>
+                </div>
+                <a href="#" data-nav="home" class="btn btn-ghost" style="margin-top:1.25rem;width:100%;justify-content:center">
+                  <i class="fas fa-arrow-left" aria-hidden="true"></i> Retour à l'accueil
+                </a>
+              </div>
+
+              <form class="pub-c" id="pubForm" novalidate>
+                <div class="pub-pn on" id="pp1">
+                  <h2 style="margin-bottom:1.5rem">Choisis une catégorie</h2>
+                  <div class="cat-sg" id="catSG"></div>
+                  <div class="fld" style="margin-top:1.5rem">
+                    <label for="pubTtl">Titre de l'annonce</label>
+                    <input type="text" id="pubTtl" class="inp" placeholder="Ex : iPhone 14 Pro Max 256GB">
+                  </div>
+                  <div class="pub-acts"><span></span><button type="button" class="btn btn-orange" id="pn1">Suivant <i class="fas fa-arrow-right" aria-hidden="true"></i></button></div>
+                </div>
+
+                <div class="pub-pn" id="pp2">
+                  <h2 style="margin-bottom:1.5rem">Prix &amp; Description</h2>
+                  <div class="fld"><label for="pubPrc">Prix (FCFA)</label><input type="number" id="pubPrc" class="inp" placeholder="185000"></div>
+                  <div class="fld">
+                    <label>État de l'article</label>
+                    <div class="cnd-g">
+                      <div class="cnd-c on" data-c="Neuf">
+                        <div class="cnd-ic">✨</div>
+                        <div>Neuf</div>
+                      </div>
+                      <div class="cnd-c" data-c="Très bon">
+                        <div class="cnd-ic">👍</div>
+                        <div>Très bon</div>
+                      </div>
+                      <div class="cnd-c" data-c="Bon">
+                        <div class="cnd-ic">✅</div>
+                        <div>Bon</div>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="fld"><label for="pubDsc">Description</label><textarea id="pubDsc" class="ta" placeholder="Décris ton article en détail…"></textarea></div>
+                  <div class="pub-acts">
+                    <button type="button" class="btn btn-ghost" id="pp2back"><i class="fas fa-arrow-left" aria-hidden="true"></i> Précédent</button>
+                    <button type="button" class="btn btn-orange" id="pn2">Suivant <i class="fas fa-arrow-right" aria-hidden="true"></i></button>
+                  </div>
+                </div>
+
+                <div class="pub-pn" id="pp3">
+                  <h2 style="margin-bottom:1.5rem">Photo &amp; Localisation</h2>
+                  <div class="fld"><label for="pubImg">Photo principale (URL)</label><input type="url" id="pubImg" class="inp" placeholder="https://…"></div>
+                  <div class="fld"><label for="pubLoc">Ville / Quartier</label><input type="text" id="pubLoc" class="inp" placeholder="Douala, Akwa"></div>
+                  <div class="pub-acts">
+                    <button type="button" class="btn btn-ghost" id="pp3back"><i class="fas fa-arrow-left" aria-hidden="true"></i> Précédent</button>
+                    <button type="button" class="btn btn-orange" id="pn3">Vérifier <i class="fas fa-arrow-right" aria-hidden="true"></i></button>
+                  </div>
+                </div>
+
+                <div class="pub-pn" id="pp4">
+                  <h2 style="margin-bottom:1.5rem">Vérification avant publication</h2>
+                  <div id="pubPrev"></div>
+                  <div class="pub-acts">
+                    <button type="button" class="btn btn-ghost" id="pp4back"><i class="fas fa-arrow-left" aria-hidden="true"></i> Modifier</button>
+                    <button type="submit" class="btn btn-orange btn-large"><i class="fas fa-rocket" aria-hidden="true"></i> Publier l'annonce</button>
+                  </div>
+                </div>
+              </form>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ═══════════════════════ VUE : PROFIL ═══════════════════════ -->
+      <div class="view" id="vProfile">
+        <div class="prf-cov" aria-hidden="true">
+          <a href="#" data-nav="home" class="prf-cov-back"><i class="fas fa-arrow-left" aria-hidden="true"></i> Accueil</a>
+        </div>
+        <div class="w prf-wrap">
+          <!-- Rangée 1 : avatar qui chevauche la bannière + badges/nom/localisation -->
+          <div class="prf-av-row">
+            <div class="prf-av" id="prfAv"></div>
+            <div class="prf-meta">
+              <div class="prf-bgs" id="prfBgs"></div>
+              <div class="prf-nm" id="prfNm"></div>
+              <div class="prf-loc"><i class="fas fa-map-marker-alt" aria-hidden="true"></i><span id="prfLoc"></span></div>
+            </div>
+          </div>
+          <!-- Rangée 2 : stats à gauche, actions à droite — jamais mélangées
+         avec la rangée avatar, sinon tout s'empile sans hiérarchie -->
+          <div class="prf-row2">
+            <div class="prf-sts" id="prfSts"></div>
+            <div class="prf-acts" id="prfActs"></div>
+          </div>
+          <div class="ptabs" role="tablist">
+            <button class="ptab on" role="tab" data-tab="ptAds">Annonces</button>
+            <button class="ptab" role="tab" data-tab="ptRevs">Avis</button>
+            <button class="ptab" role="tab" data-tab="ptInfo">Informations</button>
+          </div>
+          <div class="ptpn on" id="ptAds">
+            <div class="annonce-grille" id="prfAdsGrid" role="list"></div>
+          </div>
+          <div class="ptpn" id="ptRevs">
+            <div class="rvl" id="rvList"></div>
+          </div>
+          <div class="ptpn" id="ptInfo">
+            <div class="prf-info" id="prfInfo"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ═══════════════════════ VUE : MESSAGES ═══════════════════════ -->
+      <div class="view" id="vMsgs">
+        <div class="msg-lay">
+          <div class="msg-list-col" id="msgListCol">
+            <div class="msg-list-hd">
+              <h3>Messages</h3>
+              <a href="#" data-nav="home" class="btn-icon" aria-label="Retour à l'accueil"><i class="fas fa-times" aria-hidden="true"></i></a>
+            </div>
+            <div id="convList"></div>
+          </div>
+          <div class="msg-thread-col" id="msgThreadCol">
+            <div class="thr-empty" id="thrEmpty">
+              <i class="fas fa-comment-dots" style="font-size:2rem" aria-hidden="true"></i>
+              <p>Sélectionne une conversation</p>
+            </div>
+            <div id="thrActive" style="display:none;flex-direction:column;flex:1">
+              <div class="thr-hd">
+                <button class="btn-icon" id="thrBack" style="display:none"><i class="fas fa-arrow-left" aria-hidden="true"></i></button>
+                <div class="conv-av" id="thrAv"></div>
+                <div style="font-weight:700" id="thrNm"></div>
+              </div>
+              <div class="msgs-area" id="msgsArea"></div>
+              <div class="thr-inp">
+                <input type="text" id="msgInp" placeholder="Écrire un message…" aria-label="Votre message">
+                <button class="btn-icon" id="sendBtn" style="background:var(--p);color:#fff" aria-label="Envoyer"><i class="fas fa-paper-plane" aria-hidden="true"></i></button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
 
     </main>
-    <!-- /main -->
 
+    <!-- ══════════ BOTTOM NAV MOBILE ══════════ -->
+    <nav class="bottom-nav" aria-label="Navigation mobile principale">
+      <button class="bn-item on" data-nav="home" data-bn="home"><i class="fas fa-home" aria-hidden="true"></i>Accueil</button>
+      <button class="bn-item" id="bnFav"><i class="far fa-heart" aria-hidden="true"></i>Favoris</button>
+      <button class="bn-item bn-publish" id="bnPublish" aria-label="Publier une annonce">
+        <span class="bn-publish-ic"><i class="fas fa-plus" aria-hidden="true"></i></span>
+      </button>
+      <button class="bn-item" data-nav="msgs" data-bn="msgs" style="position:relative">
+        <i class="fas fa-comment-dots" aria-hidden="true"></i>Messages
+        <span class="cnt-bdg" id="bnMsgBdg" style="display:none;top:-2px;right:18%">0</span>
+      </button>
+      <button class="bn-item" id="bnProfile" data-bn="profile"><i class="fas fa-user" aria-hidden="true"></i>Profil</button>
+    </nav>
+
+    <button class="btt" id="btt" aria-label="Retour en haut"><i class="fas fa-arrow-up" aria-hidden="true"></i></button>
 
     <!-- FOOTER -->
     <footer class="footer" role="contentinfo">
       <div class="w">
         <div class="ftr-g">
           <div class="ftr-brand">
-            <a href="index.html" class="logo" aria-label="SOKALI — Retour à l'accueil">
-              <svg viewBox="95 65 175 210" width="30" height="36" role="img" aria-hidden="true">
+            <a href="#" class="logo" data-nav="home" aria-label="SOKALI — Retour à l'accueil">
+              <svg viewBox="80 60 700 240" width="82" height="28" role="img" aria-label="Sokali">
                 <defs>
-                  <clipPath id="ftr-sk-u"><polygon points="108,85 252,85 252,194 108,155"/></clipPath>
-                  <clipPath id="ftr-sk-l"><polygon points="108,155 252,194 252,255 108,255"/></clipPath>
+                  <clipPath id="sokali-upper-lk-ftr">
+                    <polygon points="108,85 252,85 252,194 108,155" />
+                  </clipPath>
+                  <clipPath id="sokali-lower-lk-ftr">
+                    <polygon points="108,155 252,194 252,255 108,255" />
+                  </clipPath>
                 </defs>
                 <g transform="rotate(-7,180,170)">
-                  <text x="120" y="242" font-family="Fraunces, serif" font-size="200" font-weight="900" clip-path="url(#ftr-sk-u)" fill="#E8721A">S</text>
-                  <text x="120" y="242" font-family="Fraunces, serif" font-size="200" font-weight="900" clip-path="url(#ftr-sk-l)" fill="#FDFAF5">S</text>
-                  <polygon points="180,163 191,174.5 180,186 169,174.5" fill="#1A1A2E"/>
+                  <text x="120" y="242" font-family="SokaliDisplay, Georgia, serif" font-size="200" font-weight="900" clip-path="url(#sokali-upper-lk-ftr)" fill="#E8721A">S</text>
+                  <text x="120" y="242" font-family="SokaliDisplay, Georgia, serif" font-size="200" font-weight="900" clip-path="url(#sokali-lower-lk-ftr)" fill="#FDFAF5">S</text>
+                  <polygon points="180,163 191,174.5 180,186 169,174.5" fill="#1A1A2E" />
                 </g>
-              </svg> 
-              <span class="footer-soka">SOKA<span class="logo-accent">LI</span></span>
+                <text x="255" y="242" font-family="SokaliDisplay, Georgia, serif" font-size="200" font-weight="900" letter-spacing="-4" fill="#FDFAF5">oka<tspan fill="#E8721A">li</tspan></text>
+              </svg>
             </a>
             <p>La marketplace locale qui connecte acheteurs et vendeurs à travers toute l'Afrique. Simple, rapide, de confiance.</p>
             <div class="soc-links" aria-label="Réseaux sociaux">
@@ -296,20 +585,22 @@
               <a href="#" class="soc-a" aria-label="WhatsApp SOKALI"><i class="fab fa-whatsapp" aria-hidden="true"></i></a>
             </div>
           </div>
-          <nav class="ftr-col" aria-label="Explorer SOKALI"><h5>Explorer</h5><a href="#" >Toutes les annonces</a><a href="#">Annonces urgentes</a><a href="#">Nouveautés</a><a href="#">Catégories</a></nav>
-          <nav class="ftr-col" aria-label="Mon compte"><h5>Mon compte</h5><a href="#" >Se connecter</a><a href="#" >Créer un compte</a><a href="#" >Publier une annonce</a><a href="#" >Mes favoris</a></nav>
-          <nav class="ftr-col" aria-label="Informations"><h5>Informations</h5><a href="#">À propos de SOKALI</a><a href="#">Aide & Support</a><a href="#">Signaler une annonce</a><a href="#">Mentions légales</a></nav>
+          <nav class="ftr-col" aria-label="Explorer SOKALI">
+            <h5>Explorer</h5><a href="#" data-nav="home">Toutes les annonces</a><a href="#">Annonces urgentes</a><a href="#">Nouveautés</a><a href="#">Catégories</a>
+          </nav>
+          <nav class="ftr-col" aria-label="Mon compte">
+            <h5>Mon compte</h5><a href="#" data-nav="auth">Se connecter</a><a href="#" data-nav="auth">Créer un compte</a><a href="#" data-nav="publish">Publier une annonce</a><a href="#" id="ftrFav">Mes favoris</a>
+          </nav>
+          <nav class="ftr-col" aria-label="Informations">
+            <h5>Informations</h5><a href="#">À propos de SOKALI</a><a href="#">Aide &amp; Support</a><a href="#">Signaler une annonce</a><a href="#">Mentions légales</a>
+          </nav>
         </div>
         <div class="ftr-bt">
           <p>© 2026 SOKALI. Fait avec <i class="fas fa-heart" style="color:var(--p)" aria-label="amour" role="img"></i> pour l'Afrique.</p>
           <div class="ftr-bt-lk"><a href="#">Confidentialité</a><a href="#">CGU</a><a href="#">Cookies</a></div>
         </div>
       </div>
-
     </footer>
-  <!-- /footer -->
-  </body>  
- 
-  
 
+  </body>
 </html>
