@@ -384,6 +384,13 @@ const VIEWS = {
 };
 
 function nav(page, data) {
+  // Filet de sécurité définitif : nav() est LE point de passage unique de
+  // tout changement de vue (drawer, footer, boutons JS…). Fermer les
+  // overlays ici, une fois pour toutes, évite qu'un futur lien oublie de
+  // le faire et laisse body.drawer-ouvert (overflow:hidden) collé sur la
+  // page suivante — c'est ce qui bloquait le scroll mobile.
+  window.closeDrw?.();
+  window.closeFilterPanel?.();
   document.querySelectorAll(".view").forEach(v => v.classList.remove("on"));
   const v = $(VIEWS[page]);
   if (!v) return;
@@ -407,6 +414,13 @@ function setupNav() {
     const el = e.target.closest("[data-nav]");
     if (!el) return;
     e.preventDefault();
+    // Sécurité indispensable : n'importe quel lien data-nav (drawer, footer,
+    // carte…) doit refermer drawer/panneau de filtres avant de changer de
+    // vue. Sans ça, body.drawer-ouvert (overflow:hidden) reste collé sur
+    // la page suivante et bloque tout le scroll — c'est exactement le bug
+    // qui touchait "Accueil" et "Messages" depuis le menu mobile.
+    window.closeDrw?.();
+    window.closeFilterPanel?.();
     nav(el.dataset.nav);
   });
   $("logoLink").addEventListener("click", (e) => {
@@ -495,6 +509,7 @@ function setupFilterPanel() {
     panel.setAttribute("aria-hidden", "true");
     document.body.classList.remove("drawer-ouvert");
   }
+  window.closeFilterPanel = closePanel;
 
   function syncChipsUI() {
     $("sortChips").querySelectorAll(".chip").forEach(c => c.classList.toggle("on", c.dataset.sort === tmpSort));
@@ -600,19 +615,24 @@ function renderSkeletons() {
 
 function buildCardHTML(a) {
   const fav = S.favs.includes(a.id);
+  const isNew = a.heures < 24;
   return `
   <article class="annonce-card" role="listitem" data-id="${a.id}" aria-label="${esc(a.titre)} — ${fmtPrix(a.prix)}">
     <div class="annonce-image-wrap" data-open="${a.id}">
       <img src="${esc(a.images[0])}" alt="${esc(a.titre)}" loading="lazy" class="annonce-image">
+      ${isNew ? `<span class="ann-tag">Nouveau</span>` : ""}
       <button class="btn-like ${fav?'liked':''}" type="button" data-fav="${a.id}"
               aria-label="${fav?'Retirer des favoris':'Ajouter aux favoris'}" aria-pressed="${fav}">
         <i class="fas fa-heart" aria-hidden="true"></i>
       </button>
     </div>
     <div class="annonce-detail" data-open="${a.id}">
-      <h3 class="annonce-titre">${esc(a.titre)}</h3>
-      <p class="annonce-meta-line"><i class="fas fa-location-dot" aria-hidden="true"></i> ${esc(a.localisation)} • ${fmtDate(a.heures)}</p>
       <p class="annonce-prix-inline">${fmtPrix(a.prix)}</p>
+      <h3 class="annonce-titre">${esc(a.titre)}</h3>
+      <p class="annonce-meta-line">
+        <i class="fas fa-location-dot" aria-hidden="true"></i> ${esc(a.localisation)} • ${fmtDate(a.heures)}
+        ${a.verifie ? `<i class="fas fa-badge-check ann-verified-ico" aria-hidden="true" title="Vendeur vérifié"></i>` : ""}
+      </p>
     </div>
   </article>`;
 }
@@ -1073,9 +1093,9 @@ function loadProfile(seller) {
     `<span class="prf-bg-ok"><i class="fas fa-check-circle" aria-hidden="true"></i> Vendeur vérifié</span>` : "";
 
   $("prfSts").innerHTML = `
-    <div><div class="pst-n">★ ${data.rt}</div><div class="pst-l">Note</div></div>
-    <div><div class="pst-n">${data.ads}</div><div class="pst-l">Annonces</div></div>
-    <div><div class="pst-n">${data.sales}</div><div class="pst-l">Ventes</div></div>`;
+    <div class="pst"><div class="pst-n">${data.rt.toFixed(1)}<i class="fas fa-star" aria-hidden="true"></i></div><div class="pst-l">Note</div></div>
+    <div class="pst"><div class="pst-n">${data.ads}</div><div class="pst-l">Annonces</div></div>
+    <div class="pst"><div class="pst-n">${data.sales}</div><div class="pst-l">Ventes</div></div>`;
 
   // Boutons d'action : deux jeux de boutons totalement différents selon
   // qu'on regarde SON PROPRE profil (raccourcis de gestion) ou celui d'un
@@ -1148,6 +1168,13 @@ function pubGoStep(n) {
   });
   $("pubProgF").style.width = `${(n/4)*100}%`;
   if (n === 4) buildPubPreview();
+  // Sans ça, si on a scrollé en bas de l'étape précédente, la nouvelle
+  // étape s'affiche hors champ de vision — on dirait que ses champs ont
+  // disparu alors qu'il suffit de remonter la page.
+  $("pubForm").scrollIntoView({
+    behavior: "smooth",
+    block: "start"
+  });
 }
 
 function setupPublishWizard() {

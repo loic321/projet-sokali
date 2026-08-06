@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="fr" data-theme="light" class="no-js">
+
   <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
@@ -19,6 +20,7 @@
 
     <title>SOKALI | La marketplace locale N°1 en Afrique</title>
   </head>
+
   <body>
 
     <a href="#main" class="skip">Aller au contenu principal</a>
@@ -44,10 +46,10 @@
             </defs>
             <g transform="rotate(-7,180,170)">
               <text x="120" y="242" font-family="SokaliDisplay, Georgia, serif" font-size="200" font-weight="900" clip-path="url(#sokali-upper-lk-hdr)" fill="#E8721A">S</text>
-              <text x="120" y="242" font-family="SokaliDisplay, Georgia, serif" font-size="200" font-weight="900" clip-path="url(#sokali-lower-lk-hdr)" fill="#1A1A2E">S</text>
-              <polygon points="180,163 191,174.5 180,186 169,174.5" fill="#FDFAF5" />
+              <text x="120" y="242" font-family="SokaliDisplay, Georgia, serif" font-size="200" font-weight="900" clip-path="url(#sokali-lower-lk-hdr)" class="logo-ink">S</text>
+              <polygon points="180,163 191,174.5 180,186 169,174.5" class="logo-hole" />
             </g>
-            <text x="255" y="242" font-family="SokaliDisplay, Georgia, serif" font-size="200" font-weight="900" letter-spacing="-4" fill="#1A1A2E">oka<tspan fill="#E8721A">li</tspan></text>
+            <text x="255" y="242" font-family="SokaliDisplay, Georgia, serif" font-size="200" font-weight="900" letter-spacing="-4" class="logo-ink">oka<tspan fill="#E8721A">li</tspan></text>
           </svg>
         </a>
 
@@ -166,10 +168,10 @@
             </defs>
             <g transform="rotate(-7,180,170)">
               <text x="120" y="242" font-family="SokaliDisplay, Georgia, serif" font-size="200" font-weight="900" clip-path="url(#sokali-upper-lk-drw)" fill="#E8721A">S</text>
-              <text x="120" y="242" font-family="SokaliDisplay, Georgia, serif" font-size="200" font-weight="900" clip-path="url(#sokali-lower-lk-drw)" fill="#1A1A2E">S</text>
-              <polygon points="180,163 191,174.5 180,186 169,174.5" fill="#FDFAF5" />
+              <text x="120" y="242" font-family="SokaliDisplay, Georgia, serif" font-size="200" font-weight="900" clip-path="url(#sokali-lower-lk-drw)" class="logo-ink">S</text>
+              <polygon points="180,163 191,174.5 180,186 169,174.5" class="logo-hole" />
             </g>
-            <text x="255" y="242" font-family="SokaliDisplay, Georgia, serif" font-size="200" font-weight="900" letter-spacing="-4" fill="#1A1A2E">oka<tspan fill="#E8721A">li</tspan></text>
+            <text x="255" y="242" font-family="SokaliDisplay, Georgia, serif" font-size="200" font-weight="900" letter-spacing="-4" class="logo-ink">oka<tspan fill="#E8721A">li</tspan></text>
           </svg>
         </div>
         <button class="drawer-close" id="drwClose" aria-label="Fermer le menu"><i class="fas fa-times" aria-hidden="true"></i></button>
@@ -467,40 +469,39 @@
         </div>
       </div>
 
-      <!-- ═══════════════════════ VUE : PROFIL ═══════════════════════ -->
+      <!-- ═══════════════════════ VUE : PROFIL ═══════════════════════
+           Mise en page en 2 colonnes façon marketplace pro (Airbnb, Vinted) :
+           .prf-side → carte qui chevauche la bannière (avatar, stats, actions)
+           .prf-main → onglets + contenu (annonces / avis / informations)
+           Sur mobile, tout s'empile en une seule colonne (voir CSS). -->
       <div class="view" id="vProfile">
         <div class="prf-cov" aria-hidden="true">
           <a href="#" data-nav="home" class="prf-cov-back"><i class="fas fa-arrow-left" aria-hidden="true"></i> Accueil</a>
         </div>
         <div class="w prf-wrap">
-          <!-- Rangée 1 : avatar qui chevauche la bannière + badges/nom/localisation -->
-          <div class="prf-av-row">
+          <aside class="prf-side">
             <div class="prf-av" id="prfAv"></div>
-            <div class="prf-meta">
-              <div class="prf-bgs" id="prfBgs"></div>
-              <div class="prf-nm" id="prfNm"></div>
-              <div class="prf-loc"><i class="fas fa-map-marker-alt" aria-hidden="true"></i><span id="prfLoc"></span></div>
-            </div>
-          </div>
-          <!-- Rangée 2 : stats à gauche, actions à droite — jamais mélangées
-         avec la rangée avatar, sinon tout s'empile sans hiérarchie -->
-          <div class="prf-row2">
-            <div class="prf-sts" id="prfSts"></div>
+            <div class="prf-bgs" id="prfBgs"></div>
+            <h1 class="prf-nm" id="prfNm"></h1>
+            <div class="prf-loc"><i class="fas fa-map-marker-alt" aria-hidden="true"></i><span id="prfLoc"></span></div>
+            <div class="prf-stats" id="prfSts"></div>
             <div class="prf-acts" id="prfActs"></div>
-          </div>
-          <div class="ptabs" role="tablist">
-            <button class="ptab on" role="tab" data-tab="ptAds">Annonces</button>
-            <button class="ptab" role="tab" data-tab="ptRevs">Avis</button>
-            <button class="ptab" role="tab" data-tab="ptInfo">Informations</button>
-          </div>
-          <div class="ptpn on" id="ptAds">
-            <div class="annonce-grille" id="prfAdsGrid" role="list"></div>
-          </div>
-          <div class="ptpn" id="ptRevs">
-            <div class="rvl" id="rvList"></div>
-          </div>
-          <div class="ptpn" id="ptInfo">
-            <div class="prf-info" id="prfInfo"></div>
+          </aside>
+          <div class="prf-main">
+            <div class="ptabs" role="tablist">
+              <button class="ptab on" role="tab" data-tab="ptAds">Annonces</button>
+              <button class="ptab" role="tab" data-tab="ptRevs">Avis</button>
+              <button class="ptab" role="tab" data-tab="ptInfo">Informations</button>
+            </div>
+            <div class="ptpn on" id="ptAds">
+              <div class="annonce-grille" id="prfAdsGrid" role="list"></div>
+            </div>
+            <div class="ptpn" id="ptRevs">
+              <div class="rvl" id="rvList"></div>
+            </div>
+            <div class="ptpn" id="ptInfo">
+              <div class="prf-info" id="prfInfo"></div>
+            </div>
           </div>
         </div>
       </div>
@@ -603,4 +604,5 @@
     </footer>
 
   </body>
+
 </html>
