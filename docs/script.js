@@ -652,7 +652,7 @@ function renderCardsInto(gridEl, list) {
 
 function renderAds() {
   const list = filtered();
-  $("lstCt").textContent = list.length ? `${list.length} annonce${list.length>1?'s':''} disponible${list.length>1?'s':''}` : "Aucun résultat";
+   $("lstCt").textContent = list.length ? `${list.length} annonce${list.length>1?'s':''} disponible${list.length>1?'s':''}` : "Aucun résultat";
   renderCardsInto($("adsGrid"), list);
 }
 
