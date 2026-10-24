@@ -5,9 +5,10 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "tsc -b && vite build",
+    "build": "tsc -b && vite build && cp dist/index.html dist/404.html",
     "lint": "oxlint",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "gen:api": "npx --yes openapi-typescript ../docs/openapi.yaml -o src/api/schema.d.ts"
   },
   "dependencies": {
     "@tanstack/react-query": "^5.104.5",
