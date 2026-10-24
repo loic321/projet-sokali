@@ -1,0 +1,576 @@
+openapi: 3.1.0
+info:
+  title: AVA Market API
+  version: 0.1.0
+  description: >
+    API REST de la marketplace AVA Market (nom de code : Sokali).
+    Le contrat est la source de vérité : le backend et le frontend s'y conforment.
+servers:
+  - url: http://localhost:3000/api/v1
+    description: Développement local
+tags:
+  - name: System
+  - name: Auth
+  - name: Users
+  - name: Categories
+  - name: Listings
+  - name: Favorites
+  - name: Messaging
+
+paths:
+  /health:
+    get:
+      tags: [System]
+      operationId: getHealth
+      summary: Vérifie que l'API répond
+      responses:
+        "200":
+          description: L'API fonctionne
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [status]
+                properties:
+                  status: { type: string, example: ok }
+
+  /categories:
+    get:
+      tags: [Categories]
+      operationId: listCategories
+      summary: Liste toutes les catégories
+      responses:
+        "200":
+          description: Liste des catégories
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: "#/components/schemas/Category" }
+
+  /auth/register:
+    post:
+      tags: [Auth]
+      operationId: register
+      summary: Crée un compte
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/RegisterRequest" }
+      responses:
+        "201":
+          description: Compte créé et utilisateur connecté
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/AuthResponse" }
+        "400": { $ref: "#/components/responses/BadRequest" }
+        "409": { $ref: "#/components/responses/Conflict" }
+
+  /auth/login:
+    post:
+      tags: [Auth]
+      operationId: login
+      summary: Connecte un utilisateur
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/LoginRequest" }
+      responses:
+        "200":
+          description: Connexion réussie (le refresh token est posé en cookie httpOnly)
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/AuthResponse" }
+        "400": { $ref: "#/components/responses/BadRequest" }
+        "401": { $ref: "#/components/responses/Unauthorized" }
+
+  /auth/refresh:
+    post:
+      tags: [Auth]
+      operationId: refreshToken
+      summary: Renouvelle l'access token grâce au cookie de refresh
+      security: [{ cookieAuth: [] }]
+      responses:
+        "200":
+          description: Nouvel access token
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [accessToken]
+                properties:
+                  accessToken: { type: string }
+        "401": { $ref: "#/components/responses/Unauthorized" }
+
+  /auth/logout:
+    post:
+      tags: [Auth]
+      operationId: logout
+      summary: Déconnecte l'utilisateur et révoque le refresh token
+      security: [{ bearerAuth: [] }]
+      responses:
+        "204": { description: Déconnecté }
+        "401": { $ref: "#/components/responses/Unauthorized" }
+
+  /users/me:
+    get:
+      tags: [Users]
+      operationId: getMe
+      summary: Profil de l'utilisateur connecté
+      security: [{ bearerAuth: [] }]
+      responses:
+        "200":
+          description: Profil complet
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Me" }
+        "401": { $ref: "#/components/responses/Unauthorized" }
+
+  /users/{userId}:
+    get:
+      tags: [Users]
+      operationId: getUser
+      summary: Profil public d'un utilisateur
+      parameters:
+        - { $ref: "#/components/parameters/UserId" }
+      responses:
+        "200":
+          description: Profil public
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/PublicUser" }
+        "404": { $ref: "#/components/responses/NotFound" }
+
+  /listings:
+    get:
+      tags: [Listings]
+      operationId: listListings
+      summary: Recherche et liste les annonces (pagination par curseur)
+      parameters:
+        - { name: q, in: query, description: Mot-clé, schema: { type: string, maxLength: 100 } }
+        - { name: categoryId, in: query, schema: { type: string, format: uuid } }
+        - { name: city, in: query, schema: { type: string, maxLength: 80 } }
+        - { name: minPrice, in: query, schema: { type: integer, minimum: 0 } }
+        - { name: maxPrice, in: query, schema: { type: integer, minimum: 0 } }
+        - { name: condition, in: query, schema: { $ref: "#/components/schemas/Condition" } }
+        - name: sort
+          in: query
+          schema: { type: string, enum: [recent, price_asc, price_desc], default: recent }
+        - { name: limit, in: query, schema: { type: integer, minimum: 1, maximum: 50, default: 20 } }
+        - { name: cursor, in: query, description: Curseur renvoyé par la page précédente, schema: { type: string } }
+      responses:
+        "200":
+          description: Page d'annonces
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/ListingPage" }
+        "400": { $ref: "#/components/responses/BadRequest" }
+    post:
+      tags: [Listings]
+      operationId: createListing
+      summary: Publie une annonce
+      security: [{ bearerAuth: [] }]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/ListingCreate" }
+      responses:
+        "201":
+          description: Annonce créée (statut ACTIVE)
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Listing" }
+        "400": { $ref: "#/components/responses/BadRequest" }
+        "401": { $ref: "#/components/responses/Unauthorized" }
+
+  /listings/{listingId}:
+    parameters:
+      - { $ref: "#/components/parameters/ListingId" }
+    get:
+      tags: [Listings]
+      operationId: getListing
+      summary: Détail d'une annonce
+      responses:
+        "200":
+          description: Annonce
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Listing" }
+        "404": { $ref: "#/components/responses/NotFound" }
+    patch:
+      tags: [Listings]
+      operationId: updateListing
+      summary: Modifie une annonce (propriétaire uniquement)
+      security: [{ bearerAuth: [] }]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/ListingUpdate" }
+      responses:
+        "200":
+          description: Annonce modifiée
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Listing" }
+        "400": { $ref: "#/components/responses/BadRequest" }
+        "401": { $ref: "#/components/responses/Unauthorized" }
+        "403": { $ref: "#/components/responses/Forbidden" }
+        "404": { $ref: "#/components/responses/NotFound" }
+    delete:
+      tags: [Listings]
+      operationId: deleteListing
+      summary: Supprime une annonce (propriétaire uniquement)
+      security: [{ bearerAuth: [] }]
+      responses:
+        "204": { description: Annonce supprimée }
+        "401": { $ref: "#/components/responses/Unauthorized" }
+        "403": { $ref: "#/components/responses/Forbidden" }
+        "404": { $ref: "#/components/responses/NotFound" }
+
+  /listings/{listingId}/images:
+    post:
+      tags: [Listings]
+      operationId: uploadListingImage
+      summary: Ajoute une photo (5 maximum par annonce)
+      security: [{ bearerAuth: [] }]
+      parameters:
+        - { $ref: "#/components/parameters/ListingId" }
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              required: [file]
+              properties:
+                file: { type: string, format: binary, description: "JPEG, PNG ou WebP, 5 Mo maximum" }
+      responses:
+        "201":
+          description: Photo ajoutée
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/ListingImage" }
+        "400": { $ref: "#/components/responses/BadRequest" }
+        "401": { $ref: "#/components/responses/Unauthorized" }
+        "403": { $ref: "#/components/responses/Forbidden" }
+        "404": { $ref: "#/components/responses/NotFound" }
+        "413": { description: Fichier trop volumineux, content: { application/json: { schema: { $ref: "#/components/schemas/Error" } } } }
+
+  /me/favorites:
+    get:
+      tags: [Favorites]
+      operationId: listFavorites
+      summary: Mes annonces favorites
+      security: [{ bearerAuth: [] }]
+      responses:
+        "200":
+          description: Liste des favoris
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: "#/components/schemas/Listing" }
+        "401": { $ref: "#/components/responses/Unauthorized" }
+
+  /listings/{listingId}/favorite:
+    parameters:
+      - { $ref: "#/components/parameters/ListingId" }
+    put:
+      tags: [Favorites]
+      operationId: addFavorite
+      summary: Ajoute aux favoris (idempotent)
+      security: [{ bearerAuth: [] }]
+      responses:
+        "204": { description: Annonce en favoris }
+        "401": { $ref: "#/components/responses/Unauthorized" }
+        "404": { $ref: "#/components/responses/NotFound" }
+    delete:
+      tags: [Favorites]
+      operationId: removeFavorite
+      summary: Retire des favoris
+      security: [{ bearerAuth: [] }]
+      responses:
+        "204": { description: Annonce retirée des favoris }
+        "401": { $ref: "#/components/responses/Unauthorized" }
+        "404": { $ref: "#/components/responses/NotFound" }
+
+  /listings/{listingId}/conversations:
+    post:
+      tags: [Messaging]
+      operationId: startConversation
+      summary: Contacte le vendeur (crée la conversation et envoie le premier message)
+      security: [{ bearerAuth: [] }]
+      parameters:
+        - { $ref: "#/components/parameters/ListingId" }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/MessageCreate" }
+      responses:
+        "201":
+          description: Conversation créée
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Conversation" }
+        "400": { $ref: "#/components/responses/BadRequest" }
+        "401": { $ref: "#/components/responses/Unauthorized" }
+        "404": { $ref: "#/components/responses/NotFound" }
+
+  /conversations:
+    get:
+      tags: [Messaging]
+      operationId: listConversations
+      summary: Mes conversations
+      security: [{ bearerAuth: [] }]
+      responses:
+        "200":
+          description: Liste des conversations
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: "#/components/schemas/Conversation" }
+        "401": { $ref: "#/components/responses/Unauthorized" }
+
+  /conversations/{conversationId}/messages:
+    parameters:
+      - { $ref: "#/components/parameters/ConversationId" }
+    get:
+      tags: [Messaging]
+      operationId: listMessages
+      summary: Messages d'une conversation (participants uniquement)
+      security: [{ bearerAuth: [] }]
+      responses:
+        "200":
+          description: Messages, du plus ancien au plus récent
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: "#/components/schemas/Message" }
+        "401": { $ref: "#/components/responses/Unauthorized" }
+        "403": { $ref: "#/components/responses/Forbidden" }
+        "404": { $ref: "#/components/responses/NotFound" }
+    post:
+      tags: [Messaging]
+      operationId: sendMessage
+      summary: Envoie un message (participants uniquement)
+      security: [{ bearerAuth: [] }]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/MessageCreate" }
+      responses:
+        "201":
+          description: Message envoyé
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Message" }
+        "400": { $ref: "#/components/responses/BadRequest" }
+        "401": { $ref: "#/components/responses/Unauthorized" }
+        "403": { $ref: "#/components/responses/Forbidden" }
+        "404": { $ref: "#/components/responses/NotFound" }
+
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+      description: Access token de courte durée (15 minutes)
+    cookieAuth:
+      type: apiKey
+      in: cookie
+      name: refreshToken
+      description: Refresh token en cookie httpOnly
+
+  parameters:
+    UserId: { name: userId, in: path, required: true, schema: { type: string, format: uuid } }
+    ListingId: { name: listingId, in: path, required: true, schema: { type: string, format: uuid } }
+    ConversationId: { name: conversationId, in: path, required: true, schema: { type: string, format: uuid } }
+
+  responses:
+    BadRequest:
+      description: Données invalides
+      content: { application/json: { schema: { $ref: "#/components/schemas/Error" } } }
+    Unauthorized:
+      description: Non authentifié ou jeton invalide
+      content: { application/json: { schema: { $ref: "#/components/schemas/Error" } } }
+    Forbidden:
+      description: Authentifié mais non autorisé
+      content: { application/json: { schema: { $ref: "#/components/schemas/Error" } } }
+    NotFound:
+      description: Ressource introuvable
+      content: { application/json: { schema: { $ref: "#/components/schemas/Error" } } }
+    Conflict:
+      description: Conflit, par exemple email déjà utilisé
+      content: { application/json: { schema: { $ref: "#/components/schemas/Error" } } }
+
+  schemas:
+    Error:
+      type: object
+      required: [error]
+      properties:
+        error:
+          type: object
+          required: [code, message]
+          properties:
+            code: { type: string, example: VALIDATION_ERROR }
+            message: { type: string, example: "Le prix doit être un entier positif" }
+            details:
+              type: array
+              items:
+                type: object
+                properties:
+                  field: { type: string }
+                  issue: { type: string }
+
+    Condition: { type: string, enum: [NEW, VERY_GOOD, GOOD] }
+    ListingStatus: { type: string, enum: [ACTIVE, SOLD] }
+
+    Category:
+      type: object
+      required: [id, name, slug]
+      properties:
+        id: { type: string, format: uuid }
+        name: { type: string, example: Électronique }
+        slug: { type: string, example: electronique }
+
+    PublicUser:
+      type: object
+      required: [id, name, createdAt]
+      properties:
+        id: { type: string, format: uuid }
+        name: { type: string }
+        city: { type: string }
+        createdAt: { type: string, format: date-time }
+        listingsCount: { type: integer, minimum: 0 }
+
+    Me:
+      allOf:
+        - { $ref: "#/components/schemas/PublicUser" }
+        - type: object
+          required: [email]
+          properties:
+            email: { type: string, format: email }
+
+    RegisterRequest:
+      type: object
+      required: [name, email, password]
+      properties:
+        name: { type: string, minLength: 2, maxLength: 60 }
+        email: { type: string, format: email }
+        password: { type: string, minLength: 8, maxLength: 128 }
+        city: { type: string, maxLength: 80 }
+
+    LoginRequest:
+      type: object
+      required: [email, password]
+      properties:
+        email: { type: string, format: email }
+        password: { type: string }
+
+    AuthResponse:
+      type: object
+      required: [accessToken, user]
+      properties:
+        accessToken: { type: string }
+        user: { $ref: "#/components/schemas/Me" }
+
+    ListingImage:
+      type: object
+      required: [id, url, position]
+      properties:
+        id: { type: string, format: uuid }
+        url: { type: string, format: uri }
+        position: { type: integer, minimum: 0, maximum: 4 }
+
+    Listing:
+      type: object
+      required: [id, title, description, priceXaf, condition, city, status, category, seller, images, createdAt]
+      properties:
+        id: { type: string, format: uuid }
+        title: { type: string }
+        description: { type: string }
+        priceXaf: { type: integer, minimum: 0, description: "Prix en FCFA, entier" }
+        condition: { $ref: "#/components/schemas/Condition" }
+        city: { type: string }
+        status: { $ref: "#/components/schemas/ListingStatus" }
+        category: { $ref: "#/components/schemas/Category" }
+        seller: { $ref: "#/components/schemas/PublicUser" }
+        images:
+          type: array
+          maxItems: 5
+          items: { $ref: "#/components/schemas/ListingImage" }
+        createdAt: { type: string, format: date-time }
+
+    ListingPage:
+      type: object
+      required: [items, nextCursor]
+      properties:
+        items:
+          type: array
+          items: { $ref: "#/components/schemas/Listing" }
+        nextCursor:
+          type: [string, "null"]
+          description: Null quand il n'y a plus de page suivante
+
+    ListingCreate:
+      type: object
+      required: [title, description, priceXaf, condition, city, categoryId]
+      properties:
+        title: { type: string, minLength: 3, maxLength: 120 }
+        description: { type: string, minLength: 10, maxLength: 5000 }
+        priceXaf: { type: integer, minimum: 0 }
+        condition: { $ref: "#/components/schemas/Condition" }
+        city: { type: string, minLength: 2, maxLength: 80 }
+        categoryId: { type: string, format: uuid }
+
+    ListingUpdate:
+      type: object
+      minProperties: 1
+      properties:
+        title: { type: string, minLength: 3, maxLength: 120 }
+        description: { type: string, minLength: 10, maxLength: 5000 }
+        priceXaf: { type: integer, minimum: 0 }
+        condition: { $ref: "#/components/schemas/Condition" }
+        city: { type: string, minLength: 2, maxLength: 80 }
+        categoryId: { type: string, format: uuid }
+        status: { $ref: "#/components/schemas/ListingStatus" }
+
+    MessageCreate:
+      type: object
+      required: [body]
+      properties:
+        body: { type: string, minLength: 1, maxLength: 2000 }
+
+    Message:
+      type: object
+      required: [id, conversationId, senderId, body, createdAt]
+      properties:
+        id: { type: string, format: uuid }
+        conversationId: { type: string, format: uuid }
+        senderId: { type: string, format: uuid }
+        body: { type: string }
+        createdAt: { type: string, format: date-time }
+
+    Conversation:
+      type: object
+      required: [id, listing, otherUser, createdAt]
+      properties:
+        id: { type: string, format: uuid }
+        listing:
+          type: object
+          required: [id, title]
+          properties:
+            id: { type: string, format: uuid }
+            title: { type: string }
+        otherUser: { $ref: "#/components/schemas/PublicUser" }
+        lastMessage: { $ref: "#/components/schemas/Message" }
+        createdAt: { type: string, format: date-time }
