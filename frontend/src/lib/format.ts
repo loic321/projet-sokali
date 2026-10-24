@@ -16,3 +16,5 @@ export const conditionLabel: Record<Condition, string> = {
   VERY_GOOD: 'Très bon état',
   GOOD: 'Bon état',
 }
+
+export const isNew = (iso: string) => Date.now() - new Date(iso).getTime() < 86_400_000

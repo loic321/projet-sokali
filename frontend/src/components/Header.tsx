@@ -1,49 +1,54 @@
-import { Link, useNavigate, useSearchParams } from 'react-router-dom'
-import { brand } from '../config/brand'
+import { Heart, MessageCircle, Plus, Search } from 'lucide-react'
+import { useState } from 'react'
+import { Link } from 'react-router-dom'
+import { useFavorites } from '../lib/favorites'
+import { soon } from '../lib/toast'
+import { iconButtonClass, primaryButtonClass } from '../lib/ui'
+import { Logo } from './Logo'
+import { SearchOverlay } from './SearchOverlay'
 import { ThemeToggle } from './ThemeToggle'
 
 export function Header() {
-  const navigate = useNavigate()
-  const [params] = useSearchParams()
-  const current = params.get('q') ?? ''
+  const [searchOpen, setSearchOpen] = useState(false)
+  const { ids } = useFavorites()
 
   return (
-    <header className="sticky top-0 z-40 border-b border-slate-200 bg-white/80 backdrop-blur dark:border-slate-800 dark:bg-slate-900/80">
-      <div className="mx-auto flex h-16 max-w-6xl items-center gap-3 px-4">
-        <Link to="/" className="font-display text-xl font-extrabold tracking-tight">
-          {brand.parts[0]} <span className="text-brand-500">{brand.parts[1]}</span>
-        </Link>
+    <>
+      <header className="sticky top-0 z-40 border-b border-slate-200 bg-white/85 backdrop-blur-xl dark:border-slate-800 dark:bg-slate-950/85">
+        <div className="mx-auto flex h-16 max-w-7xl items-center gap-3 px-4">
+          <Link to="/" aria-label="AVA Market, accueil" className="shrink-0">
+            <Logo />
+          </Link>
 
-        <form
-          role="search"
-          className="mx-auto max-w-md flex-1"
-          onSubmit={(e) => {
-            e.preventDefault()
-            const q = String(new FormData(e.currentTarget).get('q') ?? '').trim()
-            navigate(q ? `/?q=${encodeURIComponent(q)}` : '/')
-          }}
-        >
-          <input
-            key={current}
-            name="q"
-            type="search"
-            defaultValue={current}
-            placeholder="Rechercher une annonce…"
-            aria-label="Rechercher une annonce"
-            className="w-full rounded-full border border-slate-200 bg-slate-50 px-4 py-2 text-sm outline-none focus:border-brand-500 dark:border-slate-700 dark:bg-slate-800"
-          />
-        </form>
+          <button
+            type="button"
+            onClick={() => setSearchOpen(true)}
+            aria-haspopup="dialog"
+            className="mx-auto hidden h-11 w-full max-w-md items-center gap-3 rounded-full border border-slate-200 bg-slate-50 px-4 text-left text-sm text-slate-500 transition hover:border-brand-500 md:flex dark:border-slate-700 dark:bg-slate-900 dark:text-slate-400"
+          >
+            <Search className="size-4" aria-hidden="true" />
+            Rechercher une annonce, une ville…
+          </button>
 
-        <button
-          type="button"
-          disabled
-          title="Disponible après la mise en place de l'authentification"
-          className="hidden rounded-full bg-brand-500 px-4 py-2 text-sm font-semibold text-white opacity-50 sm:block"
-        >
-          Publier · bientôt
-        </button>
-        <ThemeToggle />
-      </div>
-    </header>
+          <div className="ml-auto flex items-center gap-1 md:ml-0">
+            <button type="button" onClick={() => setSearchOpen(true)} aria-label="Rechercher" className={`${iconButtonClass} md:hidden`}>
+              <Search className="size-5" aria-hidden="true" />
+            </button>
+            <ThemeToggle />
+            <Link to="/favorites" aria-label={`Mes favoris (${ids.length})`} className={`${iconButtonClass} hidden md:inline-flex`}>
+              <Heart className="size-5" aria-hidden="true" />
+              {ids.length > 0 && <span className="absolute right-2 top-2 size-2.5 rounded-full bg-brand-500 ring-2 ring-white dark:ring-slate-950" />}
+            </Link>
+            <button type="button" onClick={() => soon('La messagerie')} aria-label="Messages" className={`${iconButtonClass} hidden md:inline-flex`}>
+              <MessageCircle className="size-5" aria-hidden="true" />
+            </button>
+            <button type="button" onClick={() => soon('La publication')} className={`${primaryButtonClass} ml-2 hidden md:inline-flex`}>
+              <Plus className="size-4" aria-hidden="true" /> Publier
+            </button>
+          </div>
+        </div>
+      </header>
+      <SearchOverlay open={searchOpen} onClose={() => setSearchOpen(false)} />
+    </>
   )
 }
