@@ -1,4 +1,6 @@
 import { useEffect, useState } from 'react'
+import { Moon, Sun } from 'lucide-react'
+import { iconButtonClass } from '../lib/ui'
 
 function getInitialDark(): boolean {
   try {
@@ -27,9 +29,9 @@ export function ThemeToggle() {
       type="button"
       onClick={() => setDark((d) => !d)}
       aria-label={dark ? 'Activer le mode clair' : 'Activer le mode sombre'}
-      className="flex h-10 w-10 items-center justify-center rounded-full text-lg hover:bg-slate-100 dark:hover:bg-slate-800"
+      className={iconButtonClass}
     >
-      {dark ? '☀' : '☾'}
+      {dark ? <Sun className="size-5" aria-hidden="true" /> : <Moon className="size-5" aria-hidden="true" />}
     </button>
   )
 }
