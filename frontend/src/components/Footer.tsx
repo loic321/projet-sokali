@@ -1,24 +1,41 @@
 import { Link } from 'react-router-dom'
 import { brand } from '../config/brand'
+import { soon } from '../lib/toast'
 import { Logo } from './Logo'
+
+const linkClass =
+  'inline-flex min-h-11 items-center text-sm text-slate-300 transition hover:translate-x-1 hover:text-brand-500'
+const titleClass = 'mb-2 text-xs font-bold uppercase tracking-wider text-slate-400'
 
 export function Footer() {
   return (
-    <footer className="border-t border-slate-200 bg-white pb-28 pt-10 md:pb-10 dark:border-slate-800 dark:bg-slate-900">
-      <div className="mx-auto flex max-w-7xl flex-col gap-6 px-4 md:flex-row md:items-start md:justify-between">
-        <div className="max-w-sm">
-          <Logo />
-          <p className="mt-3 text-sm text-slate-600 dark:text-slate-400">{brand.tagline}</p>
+    <footer className="mt-16 bg-slate-950 pb-28 pt-14 text-slate-300 md:pb-10">
+      <div className="mx-auto grid max-w-7xl gap-10 px-4 md:grid-cols-[2fr_1fr_1fr]">
+        <div>
+          <Logo onDark />
+          <p className="mt-4 max-w-xs text-sm text-slate-400">
+            {brand.tagline} Une marketplace pensée pour les particuliers camerounais.
+          </p>
         </div>
-        <nav aria-label="Pied de page" className="flex flex-col gap-1 text-sm font-medium">
-          <Link to="/" className="inline-flex min-h-11 items-center hover:text-brand-700 dark:hover:text-brand-500">Accueil</Link>
-          <Link to="/search" className="inline-flex min-h-11 items-center hover:text-brand-700 dark:hover:text-brand-500">Toutes les annonces</Link>
-          <Link to="/favorites" className="inline-flex min-h-11 items-center hover:text-brand-700 dark:hover:text-brand-500">Mes favoris</Link>
+        <nav aria-label="Explorer">
+          <h2 className={titleClass}>Explorer</h2>
+          <ul>
+            <li><Link to="/" className={linkClass}>Accueil</Link></li>
+            <li><Link to="/search" className={linkClass}>Toutes les annonces</Link></li>
+            <li><Link to="/favorites" className={linkClass}>Mes favoris</Link></li>
+          </ul>
+        </nav>
+        <nav aria-label="Mon espace">
+          <h2 className={titleClass}>Mon espace</h2>
+          <ul>
+            <li><button type="button" onClick={() => soon('La connexion')} className={linkClass}>Se connecter</button></li>
+            <li><button type="button" onClick={() => soon('La publication')} className={linkClass}>Publier une annonce</button></li>
+          </ul>
         </nav>
       </div>
-      <p className="mx-auto mt-6 max-w-7xl px-4 text-xs text-slate-500 dark:text-slate-400">
+      <div className="mx-auto mt-10 max-w-7xl border-t border-white/10 px-4 pt-6 text-xs text-slate-400">
         © 2026 {brand.name} · Projet de démonstration : les annonces affichées sont des données fictives.
-      </p>
+      </div>
     </footer>
   )
 }
