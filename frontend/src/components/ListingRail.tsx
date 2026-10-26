@@ -20,7 +20,7 @@ export function ListingRail({
     return (
       <Rail title={title} busy>
         {Array.from({ length: 5 }, (_, i) => (
-          <div key={i} className={`${railItemClass} aspect-3/4 animate-pulse rounded-2xl bg-slate-200 dark:bg-slate-800`} />
+          <div key={i} className={`${railItemClass} skeleton aspect-3/4 rounded-2xl`} />
         ))}
       </Rail>
     )
@@ -31,9 +31,9 @@ export function ListingRail({
 
   return (
     <Rail title={title} href={href}>
-      {items.map((listing) => (
+      {items.map((listing, index) => (
         <div key={listing.id} className={railItemClass}>
-          <ListingCard listing={listing} />
+          <ListingCard listing={listing} index={index} />
         </div>
       ))}
     </Rail>

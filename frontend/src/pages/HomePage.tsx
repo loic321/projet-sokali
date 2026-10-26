@@ -1,15 +1,18 @@
-import { MapPin, Search, Smartphone, Zap } from 'lucide-react'
+import { Compass, MapPin, Plus, Search, Smartphone, Zap } from 'lucide-react'
 import { Link, useNavigate } from 'react-router-dom'
 import { useCategories } from '../api/queries'
 import { ListingRail } from '../components/ListingRail'
 import { brand } from '../config/brand'
 import { categoryIcons, fallbackCategoryIcon } from '../lib/categoryIcons'
 import { soon } from '../lib/toast'
-import { pillClass, primaryButtonClass } from '../lib/ui'
+import { glassButtonClass, pillClass, primaryButtonClass } from '../lib/ui'
+
+const container = 'mx-auto max-w-7xl px-4'
 
 const trust = [
   { icon: MapPin, text: 'Annonces locales' },
   { icon: Zap, text: 'Publication gratuite' },
+  { icon: Search, text: 'Recherche rapide' },
   { icon: Smartphone, text: 'Pensé pour le mobile' },
 ]
 
@@ -19,18 +22,28 @@ export function HomePage() {
 
   return (
     <>
-      <section className="relative mb-6 overflow-hidden rounded-3xl bg-slate-900 px-6 py-10 text-white sm:px-10 sm:py-14">
-        <div aria-hidden="true" className="pointer-events-none absolute -right-16 -top-24 size-80 rounded-full bg-brand-500/25 blur-3xl" />
-        <div aria-hidden="true" className="pointer-events-none absolute -bottom-32 -left-16 size-80 rounded-full bg-amber-400/15 blur-3xl" />
-        <div className="relative max-w-2xl">
-          <p className="mb-4 inline-flex items-center gap-2 rounded-full border border-amber-300/40 bg-amber-300/10 px-3 py-1 text-xs font-bold uppercase tracking-wider text-amber-300">
-            <span className="size-1.5 rounded-full bg-amber-300" aria-hidden="true" /> Marketplace locale
+      {/* ---------- Hero plein écran ---------- */}
+      <section className="relative isolate overflow-hidden bg-slate-950 px-4 pb-16 pt-14 text-center text-white sm:pb-24 sm:pt-20">
+        <div aria-hidden="true" className="orb-drift pointer-events-none absolute -right-24 -top-32 -z-10 size-112 rounded-full bg-brand-500/30 blur-[90px]" />
+        <div aria-hidden="true" className="orb-drift pointer-events-none absolute -bottom-40 -left-24 -z-10 size-112 rounded-full bg-amber-400/20 blur-[90px] [animation-delay:-7s]" />
+        <div aria-hidden="true" className="pointer-events-none absolute left-1/2 top-1/3 -z-10 size-64 -translate-x-1/2 rounded-full bg-emerald-600/20 blur-[80px]" />
+
+        <div className="mx-auto max-w-3xl">
+          <p className="reveal-up mb-6 inline-flex items-center gap-2 rounded-full border border-amber-300/40 bg-amber-300/10 px-4 py-1.5 text-xs font-bold uppercase tracking-wider text-amber-300">
+            <span className="pulse-dot size-1.5 rounded-full bg-amber-300" aria-hidden="true" />
+            Marketplace locale · Cameroun
           </p>
-          <h1 className="font-display text-4xl font-extrabold leading-tight sm:text-5xl">
+
+          <h1 className="reveal-up text-4xl font-extrabold leading-[1.1] [animation-delay:100ms] sm:text-6xl">
             Achète. Vends.{' '}
-            <span className="bg-linear-to-r from-brand-500 to-amber-300 bg-clip-text text-transparent">Près de chez toi.</span>
+            <span className="bg-linear-to-r from-brand-500 to-amber-300 bg-clip-text text-transparent">
+              Près de chez toi.
+            </span>
           </h1>
-          <p className="mt-3 max-w-xl text-slate-300">{brand.tagline} Trouve le bon deal ou publie ton annonce en quelques minutes.</p>
+
+          <p className="reveal-up mx-auto mt-5 max-w-xl text-base text-slate-300 [animation-delay:200ms] sm:text-lg">
+            {brand.tagline} Trouve le bon deal ou publie ton annonce en quelques minutes.
+          </p>
 
           <form
             role="search"
@@ -39,10 +52,10 @@ export function HomePage() {
               const q = String(new FormData(e.currentTarget).get('q') ?? '').trim()
               navigate(q ? `/search?q=${encodeURIComponent(q)}` : '/search')
             }}
-            className="mt-6 flex max-w-xl items-center gap-2 rounded-full bg-white p-1.5 shadow-xl"
+            className="reveal-up mx-auto mt-8 flex max-w-xl items-center gap-2 rounded-full bg-white p-1.5 shadow-[0_20px_50px_-12px_rgba(0,0,0,.5)] [animation-delay:300ms]"
           >
-            <label className="flex h-11 flex-1 items-center gap-2 pl-4 text-slate-900">
-              <Search className="size-5 text-slate-500" aria-hidden="true" />
+            <label className="flex h-12 flex-1 items-center gap-3 pl-4 text-slate-900">
+              <Search className="size-5 shrink-0 text-slate-500" aria-hidden="true" />
               <input
                 name="q"
                 type="search"
@@ -54,35 +67,55 @@ export function HomePage() {
             <button type="submit" className={primaryButtonClass}>Rechercher</button>
           </form>
 
-          <button type="button" onClick={() => soon('La publication')} className="mt-4 inline-flex min-h-11 items-center text-sm font-semibold text-amber-300 underline-offset-4 hover:underline">
-            Tu as quelque chose à vendre ? Publier une annonce
-          </button>
+          <div className="reveal-up mt-6 flex flex-wrap justify-center gap-3 [animation-delay:400ms]">
+            <button type="button" onClick={() => soon('La publication')} className={glassButtonClass}>
+              <Plus className="size-4" aria-hidden="true" /> Publier une annonce
+            </button>
+            <button
+              type="button"
+              onClick={() => document.getElementById('annonces')?.scrollIntoView({ behavior: 'smooth' })}
+              className={glassButtonClass}
+            >
+              <Compass className="size-4" aria-hidden="true" /> Explorer
+            </button>
+          </div>
         </div>
       </section>
 
-      <ul className="mb-6 flex flex-wrap gap-x-6 gap-y-1 text-sm text-slate-600 dark:text-slate-300">
-        {trust.map(({ icon: Icon, text }) => (
-          <li key={text} className="flex min-h-8 items-center gap-2">
-            <Icon className="size-4 text-brand-700 dark:text-brand-500" aria-hidden="true" /> {text}
-          </li>
+      {/* ---------- Barre d'atouts (uniquement des promesses vraies) ---------- */}
+      <div className="border-b border-slate-200 bg-white dark:border-slate-800 dark:bg-slate-900">
+        <ul className={`${container} flex flex-wrap justify-center gap-x-8 gap-y-1 py-3`}>
+          {trust.map(({ icon: Icon, text }) => (
+            <li key={text} className="flex min-h-8 items-center gap-2 text-sm font-semibold text-slate-600 dark:text-slate-300">
+              <Icon className="size-4 text-brand-700 dark:text-brand-500" aria-hidden="true" /> {text}
+            </li>
+          ))}
+        </ul>
+      </div>
+
+      {/* ---------- Catégories collantes : centrées si la place suffit, défilantes sinon ---------- */}
+      <div className="sticky top-16 z-30 border-b border-slate-200 bg-stone-50/90 backdrop-blur-xl dark:border-slate-800 dark:bg-slate-950/90">
+        <nav aria-label="Catégories" className="no-scrollbar overflow-x-auto px-4 py-3">
+          <div className="mx-auto flex w-max gap-2">
+            {categories.data?.map((c) => {
+              const Icon = categoryIcons[c.slug] ?? fallbackCategoryIcon
+              return (
+                <Link key={c.id} to={`/search?category=${c.id}`} className={pillClass(false)}>
+                  <Icon className="size-4" aria-hidden="true" /> {c.name}
+                </Link>
+              )
+            })}
+          </div>
+        </nav>
+      </div>
+
+      {/* ---------- Rails horizontaux ---------- */}
+      <div id="annonces" className={`${container} scroll-mt-32 pt-8`}>
+        <ListingRail title="Nouveautés" filters={{ sort: 'recent' }} href="/search" />
+        {categories.data?.map((c) => (
+          <ListingRail key={c.id} title={c.name} filters={{ categoryId: c.id }} href={`/search?category=${c.id}`} />
         ))}
-      </ul>
-
-      <nav aria-label="Catégories" className="no-scrollbar -mx-4 mb-8 flex gap-2 overflow-x-auto px-4 pb-1 md:mx-0 md:flex-wrap md:px-0">
-        {categories.data?.map((c) => {
-          const Icon = categoryIcons[c.slug] ?? fallbackCategoryIcon
-          return (
-            <Link key={c.id} to={`/search?category=${c.id}`} className={pillClass(false)}>
-              <Icon className="size-4" aria-hidden="true" /> {c.name}
-            </Link>
-          )
-        })}
-      </nav>
-
-      <ListingRail title="Nouveautés" filters={{ sort: 'recent' }} href="/search" />
-      {categories.data?.map((c) => (
-        <ListingRail key={c.id} title={c.name} filters={{ categoryId: c.id }} href={`/search?category=${c.id}`} />
-      ))}
+      </div>
     </>
   )
 }

@@ -4,6 +4,7 @@ import { Link, useSearchParams } from 'react-router-dom'
 import { useCategories, useListings } from '../api/queries'
 import type { ListingFilters, SortOption } from '../api/queries'
 import type { Condition } from '../api/types'
+import { BackButton } from '../components/BackButton'
 import { FiltersPanel } from '../components/FiltersPanel'
 import type { FilterValues } from '../components/FiltersPanel'
 import { ListingCard } from '../components/ListingCard'
@@ -71,9 +72,7 @@ export function SearchPage() {
 
   return (
     <>
-      <nav aria-label="Fil d'Ariane" className={`mb-3 text-sm ${mutedText}`}>
-        <Link to="/" className="inline-flex min-h-11 items-center hover:text-brand-700 dark:hover:text-brand-500">← Accueil</Link>
-      </nav>
+      <BackButton fallback="/" label="Retour" />
 
       <div className="mb-4 flex items-center justify-between gap-3">
         <h1 className="font-display text-2xl font-extrabold">{filters.q ? `Résultats pour « ${filters.q} »` : (category?.name ?? 'Toutes les annonces')}</h1>
@@ -98,7 +97,7 @@ export function SearchPage() {
       {listings.isPending && (
         <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5" aria-busy="true">
           {Array.from({ length: 6 }, (_, i) => (
-            <div key={i} className="aspect-3/4 animate-pulse rounded-2xl bg-slate-200 dark:bg-slate-800" />
+            <div key={i} className="skeleton aspect-3/4 rounded-2xl" />
           ))}
         </div>
       )}
@@ -120,8 +119,8 @@ export function SearchPage() {
 
       {items.length > 0 && (
         <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5">
-          {items.map((listing) => (
-            <ListingCard key={listing.id} listing={listing} />
+          {items.map((listing, index) => (
+            <ListingCard key={listing.id} listing={listing} index={index} />
           ))}
         </div>
       )}

@@ -2,6 +2,7 @@ import { Heart, MapPin, MessageCircle, Share2 } from 'lucide-react'
 import { Link, useParams } from 'react-router-dom'
 import { ApiError } from '../api/client'
 import { useListing } from '../api/queries'
+import { BackButton } from '../components/BackButton'
 import { ImagePlaceholder } from '../components/ImagePlaceholder'
 import { ListingRail } from '../components/ListingRail'
 import { useFavorites } from '../lib/favorites'
@@ -15,7 +16,7 @@ export function ListingPage() {
   const { has, toggle } = useFavorites()
 
   if (isPending) {
-    return <div className="aspect-4/3 animate-pulse rounded-3xl bg-slate-200 dark:bg-slate-800" aria-busy="true" />
+    return <div className="skeleton aspect-4/3 rounded-3xl" aria-busy="true" />
   }
 
   if (error || !listing) {
@@ -43,13 +44,7 @@ export function ListingPage() {
 
   return (
     <>
-      <nav aria-label="Fil d'Ariane" className={`mb-3 flex flex-wrap items-center gap-x-2 text-sm ${mutedText}`}>
-        <Link to="/" className="inline-flex min-h-11 items-center hover:text-brand-700 dark:hover:text-brand-500">Accueil</Link>
-        <span aria-hidden="true">›</span>
-        <Link to={`/search?category=${listing.category.id}`} className="inline-flex min-h-11 items-center hover:text-brand-700 dark:hover:text-brand-500">
-          {listing.category.name}
-        </Link>
-      </nav>
+      <BackButton fallback={`/search?category=${listing.category.id}`} label="Retour aux annonces" />
 
       <div className="grid gap-8 lg:grid-cols-[1fr_360px]">
         <div>

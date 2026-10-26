@@ -1,10 +1,15 @@
-import { Outlet, ScrollRestoration } from 'react-router-dom'
+import { Outlet, ScrollRestoration, useLocation } from 'react-router-dom'
+import { BackToTop } from './BackToTop'
 import { BottomNav } from './BottomNav'
 import { Footer } from './Footer'
 import { Header } from './Header'
 import { Toaster } from './Toaster'
 
 export function Layout() {
+  const { pathname } = useLocation()
+  // L'accueil gère lui-même ses largeurs (le hero est plein écran) ; les autres pages sont centrées.
+  const contained = pathname !== '/'
+
   return (
     <>
       <a
@@ -14,11 +19,12 @@ export function Layout() {
         Aller au contenu
       </a>
       <Header />
-      <main id="main" className="mx-auto max-w-7xl px-4 pt-6">
+      <main id="main" key={pathname} className={`page-enter ${contained ? 'mx-auto max-w-7xl px-4 pt-2' : ''}`}>
         <Outlet />
       </main>
       <Footer />
       <BottomNav />
+      <BackToTop />
       <Toaster />
       <ScrollRestoration />
     </>

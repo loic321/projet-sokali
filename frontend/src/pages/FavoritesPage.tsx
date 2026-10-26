@@ -3,6 +3,7 @@ import { useQueries } from '@tanstack/react-query'
 import { Link } from 'react-router-dom'
 import { apiGet } from '../api/client'
 import type { Listing } from '../api/types'
+import { BackButton } from '../components/BackButton'
 import { ListingCard } from '../components/ListingCard'
 import { useFavorites } from '../lib/favorites'
 import { mutedText, primaryButtonClass } from '../lib/ui'
@@ -20,6 +21,7 @@ export function FavoritesPage() {
 
   return (
     <>
+      <BackButton fallback="/" label="Accueil" />
       <h1 className="mb-1 font-display text-2xl font-extrabold">Mes favoris</h1>
       <p className={`mb-6 text-sm ${mutedText}`}>Enregistrés sur cet appareil.</p>
 
@@ -32,8 +34,8 @@ export function FavoritesPage() {
         </div>
       ) : (
         <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5">
-          {items.map((listing) => (
-            <ListingCard key={listing.id} listing={listing} />
+          {items.map((listing, index) => (
+            <ListingCard key={listing.id} listing={listing} index={index} />
           ))}
         </div>
       )}
