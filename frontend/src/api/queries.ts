@@ -14,6 +14,7 @@ export type ListingFilters = {
   minPrice?: number
   maxPrice?: number
   condition?: Condition
+  city?: string
 }
 
 export const useCategories = () =>

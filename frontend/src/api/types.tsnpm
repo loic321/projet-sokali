@@ -1,0 +1,1 @@
+export type ContactInfo = components['schemas']['ContactInfo'] run gen:api

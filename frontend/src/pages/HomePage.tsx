@@ -1,36 +1,36 @@
-import { MapPin, Search, Smartphone, Zap } from 'lucide-react'
+import { LayoutGrid, Search } from 'lucide-react'
 import { Link, useNavigate } from 'react-router-dom'
-import { useCategories } from '../api/queries'
+import { useCategories, useListingRail } from '../api/queries'
+import { CitySelector } from '../components/CitySelector'
 import { ListingRail } from '../components/ListingRail'
 import { brand } from '../config/brand'
+import { useCity } from '../lib/city'
 import { categoryIcons, fallbackCategoryIcon } from '../lib/categoryIcons'
-import { soon } from '../lib/toast'
-import { pillClass, primaryButtonClass } from '../lib/ui'
+import { ghostButtonClass, primaryButtonClass } from '../lib/ui'
 
-const trust = [
-  { icon: MapPin, text: 'Annonces locales' },
-  { icon: Zap, text: 'Publication gratuite' },
-  { icon: Smartphone, text: 'Pensé pour le mobile' },
-]
+const tileCircle =
+  'flex size-14 items-center justify-center rounded-full border border-slate-200 bg-white text-brand-700 shadow-sm transition duration-200 group-hover:-translate-y-1 group-hover:border-brand-500 group-hover:shadow-md dark:border-slate-700 dark:bg-slate-900 dark:text-brand-500'
+const tileLabel = 'text-center text-xs font-semibold leading-tight text-slate-700 dark:text-slate-300'
 
 export function HomePage() {
   const navigate = useNavigate()
   const categories = useCategories()
+  const { city, setCity } = useCity()
+  const latest = useListingRail({ sort: 'recent', city: city ?? undefined })
+  const emptyCity = latest.isSuccess && (latest.data?.length ?? 0) === 0
 
   return (
     <>
-      <section className="relative mb-6 overflow-hidden rounded-3xl bg-slate-900 px-6 py-10 text-white sm:px-10 sm:py-14">
-        <div aria-hidden="true" className="pointer-events-none absolute -right-16 -top-24 size-80 rounded-full bg-brand-500/25 blur-3xl" />
-        <div aria-hidden="true" className="pointer-events-none absolute -bottom-32 -left-16 size-80 rounded-full bg-amber-400/15 blur-3xl" />
-        <div className="relative max-w-2xl">
-          <p className="mb-4 inline-flex items-center gap-2 rounded-full border border-amber-300/40 bg-amber-300/10 px-3 py-1 text-xs font-bold uppercase tracking-wider text-amber-300">
-            <span className="size-1.5 rounded-full bg-amber-300" aria-hidden="true" /> Marketplace locale
-          </p>
-          <h1 className="font-display text-4xl font-extrabold leading-tight sm:text-5xl">
-            Achète. Vends.{' '}
-            <span className="bg-linear-to-r from-brand-500 to-amber-300 bg-clip-text text-transparent">Près de chez toi.</span>
+      {/* Hero compact : la recherche est immédiatement visible et les annonces apparaissent vite. */}
+      <section className="relative isolate overflow-hidden bg-slate-950 px-4 pb-8 pt-8 text-center text-white sm:pb-12 sm:pt-12">
+        <div aria-hidden="true" className="orb-drift pointer-events-none absolute -right-24 -top-32 -z-10 size-96 rounded-full bg-brand-500/30 blur-[90px]" />
+        <div aria-hidden="true" className="orb-drift pointer-events-none absolute -bottom-40 -left-24 -z-10 size-96 rounded-full bg-amber-400/20 blur-[90px] [animation-delay:-7s]" />
+
+        <div className="mx-auto max-w-2xl">
+          <h1 className="reveal-up text-3xl font-extrabold leading-tight sm:text-5xl">
+            Achetez. Vendez.{' '}
+            <span className="bg-linear-to-r from-brand-500 to-amber-300 bg-clip-text text-transparent">Près de chez vous.</span>
           </h1>
-          <p className="mt-3 max-w-xl text-slate-300">{brand.tagline} Trouve le bon deal ou publie ton annonce en quelques minutes.</p>
 
           <form
             role="search"
@@ -39,50 +39,66 @@ export function HomePage() {
               const q = String(new FormData(e.currentTarget).get('q') ?? '').trim()
               navigate(q ? `/search?q=${encodeURIComponent(q)}` : '/search')
             }}
-            className="mt-6 flex max-w-xl items-center gap-2 rounded-full bg-white p-1.5 shadow-xl"
+            className="reveal-up mt-6 flex items-center gap-2 rounded-full bg-white p-1.5 shadow-[0_20px_50px_-12px_rgba(0,0,0,.5)] [animation-delay:120ms]"
           >
-            <label className="flex h-11 flex-1 items-center gap-2 pl-4 text-slate-900">
-              <Search className="size-5 text-slate-500" aria-hidden="true" />
+            <label className="flex h-12 flex-1 items-center gap-3 pl-4 text-slate-900">
+              <Search className="size-5 shrink-0 text-slate-500" aria-hidden="true" />
               <input
                 name="q"
                 type="search"
-                placeholder="Que cherches-tu ?"
-                aria-label="Que cherches-tu ?"
-                className="w-full bg-transparent text-base outline-none placeholder:text-slate-500"
+                placeholder="Que recherchez-vous ?"
+                aria-label="Que recherchez-vous ?"
+                className="w-full min-w-0 bg-transparent text-base outline-none placeholder:text-slate-500"
               />
             </label>
             <button type="submit" className={primaryButtonClass}>Rechercher</button>
           </form>
 
-          <button type="button" onClick={() => soon('La publication')} className="mt-4 inline-flex min-h-11 items-center text-sm font-semibold text-amber-300 underline-offset-4 hover:underline">
-            Tu as quelque chose à vendre ? Publier une annonce
-          </button>
+          <div className="reveal-up mt-4 flex justify-center [animation-delay:220ms]">
+            <CitySelector onDark />
+          </div>
         </div>
       </section>
 
-      <ul className="mb-6 flex flex-wrap gap-x-6 gap-y-1 text-sm text-slate-600 dark:text-slate-300">
-        {trust.map(({ icon: Icon, text }) => (
-          <li key={text} className="flex min-h-8 items-center gap-2">
-            <Icon className="size-4 text-brand-700 dark:text-brand-500" aria-hidden="true" /> {text}
-          </li>
+      <div className="mx-auto max-w-7xl px-4">
+        {/* Catégories : grosses cibles, repérage immédiat. */}
+        <nav aria-label="Catégories" className="no-scrollbar -mx-4 overflow-x-auto px-4 py-6 md:mx-0 md:px-0">
+          <ul className="flex w-max gap-4 md:w-full md:justify-between md:gap-2">
+            <li>
+              <Link to="/search" className="group flex w-18 flex-col items-center gap-2">
+                <span className={tileCircle}><LayoutGrid className="size-6" aria-hidden="true" /></span>
+                <span className={tileLabel}>Tout</span>
+              </Link>
+            </li>
+            {categories.data?.map((c) => {
+              const Icon = categoryIcons[c.slug] ?? fallbackCategoryIcon
+              return (
+                <li key={c.id}>
+                  <Link to={`/search?category=${c.id}`} className="group flex w-18 flex-col items-center gap-2">
+                    <span className={tileCircle}><Icon className="size-6" aria-hidden="true" /></span>
+                    <span className={tileLabel}>{c.name}</span>
+                  </Link>
+                </li>
+              )
+            })}
+          </ul>
+        </nav>
+
+        {emptyCity && (
+          <div className="mb-10 rounded-3xl border border-slate-200 bg-white p-8 text-center dark:border-slate-800 dark:bg-slate-900">
+            <p className="text-xl font-extrabold">Aucune annonce à {city} pour le moment</p>
+            <p className="mt-1 text-slate-500 dark:text-slate-400">{brand.name} se remplit chaque jour. Découvrez ce qui est proposé ailleurs.</p>
+            <button type="button" onClick={() => setCity(null)} className={`${ghostButtonClass} mt-4`}>
+              Voir tout le Cameroun
+            </button>
+          </div>
+        )}
+
+        <ListingRail title="Nouveautés" filters={{ sort: 'recent' }} href="/search" />
+        {categories.data?.map((c) => (
+          <ListingRail key={c.id} title={c.name} filters={{ categoryId: c.id }} href={`/search?category=${c.id}`} />
         ))}
-      </ul>
-
-      <nav aria-label="Catégories" className="no-scrollbar -mx-4 mb-8 flex gap-2 overflow-x-auto px-4 pb-1 md:mx-0 md:flex-wrap md:px-0">
-        {categories.data?.map((c) => {
-          const Icon = categoryIcons[c.slug] ?? fallbackCategoryIcon
-          return (
-            <Link key={c.id} to={`/search?category=${c.id}`} className={pillClass(false)}>
-              <Icon className="size-4" aria-hidden="true" /> {c.name}
-            </Link>
-          )
-        })}
-      </nav>
-
-      <ListingRail title="Nouveautés" filters={{ sort: 'recent' }} href="/search" />
-      {categories.data?.map((c) => (
-        <ListingRail key={c.id} title={c.name} filters={{ categoryId: c.id }} href={`/search?category=${c.id}`} />
-      ))}
+      </div>
     </>
   )
 }

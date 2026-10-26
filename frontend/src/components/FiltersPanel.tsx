@@ -3,7 +3,7 @@ import { useState } from 'react'
 import type { Condition } from '../api/types'
 import type { SortOption } from '../api/queries'
 import { conditionLabel } from '../lib/format'
-import { ghostButtonClass, iconButtonClass, mutedText, pillClass, primaryButtonClass } from '../lib/ui'
+import { drawerClass, ghostButtonClass, iconButtonClass, mutedText, pillClass, primaryButtonClass } from '../lib/ui'
 import { Dialog } from './Dialog'
 
 export type FilterValues = {
@@ -43,7 +43,8 @@ function FiltersForm({
     'h-12 w-full rounded-2xl border border-slate-200 bg-transparent px-4 text-base outline-none focus:border-brand-500 dark:border-slate-700'
 
   return (
-    <div className="flex h-full flex-col">
+    <div className="flex max-h-[88dvh] flex-col md:h-dvh md:max-h-none">
+      <div className="mx-auto mt-2 h-1 w-10 shrink-0 rounded-full bg-slate-300 md:hidden" aria-hidden="true" />
       <div className="flex items-center justify-between border-b border-slate-200 px-5 py-3 dark:border-slate-800">
         <h2 className="font-display text-lg font-extrabold">Filtrer et trier</h2>
         <button type="button" onClick={onClose} aria-label="Fermer les filtres" className={iconButtonClass}>
@@ -119,7 +120,7 @@ export function FiltersPanel({
       open={open}
       onClose={onClose}
       label="Filtres et tri"
-      className="panel-right fixed inset-y-0 left-auto right-0 m-0 h-dvh max-h-none w-[min(380px,92vw)] max-w-none bg-white p-0 text-slate-900 shadow-2xl backdrop:bg-slate-950/60 dark:bg-slate-900 dark:text-slate-100"
+      className={drawerClass}
     >
       <FiltersForm values={values} onApply={onApply} onClose={onClose} />
     </Dialog>

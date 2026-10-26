@@ -4,9 +4,13 @@ import { Link, useSearchParams } from 'react-router-dom'
 import { useCategories, useListings } from '../api/queries'
 import type { ListingFilters, SortOption } from '../api/queries'
 import type { Condition } from '../api/types'
+import { Breadcrumb } from '../components/Breadcrumb'
+import { CitySelector } from '../components/CitySelector'
 import { FiltersPanel } from '../components/FiltersPanel'
 import type { FilterValues } from '../components/FiltersPanel'
 import { ListingCard } from '../components/ListingCard'
+import { PageTitle } from '../components/PageTitle'
+import { useCity } from '../lib/city'
 import { conditionLabel, formatPrice } from '../lib/format'
 import { ghostButtonClass, mutedText, pillClass, primaryButtonClass } from '../lib/ui'
 
@@ -18,6 +22,7 @@ const toNumber = (v: string | null) => {
 export function SearchPage() {
   const [params, setParams] = useSearchParams()
   const [filtersOpen, setFiltersOpen] = useState(false)
+  const { city, setCity } = useCity()
   const categories = useCategories()
 
   const sortParam = params.get('sort')
@@ -33,6 +38,7 @@ export function SearchPage() {
     minPrice: toNumber(params.get('minPrice')),
     maxPrice: toNumber(params.get('maxPrice')),
     condition,
+    city: city ?? undefined,
   }
 
   const listings = useListings(filters)
@@ -58,25 +64,26 @@ export function SearchPage() {
     setFiltersOpen(false)
   }
 
-  // Filtres actifs affichés en pastilles supprimables (reconnaissance plutôt que mémoire).
-  const active: { label: string; clear: Record<string, undefined> }[] = []
-  if (filters.q) active.push({ label: `« ${filters.q} »`, clear: { q: undefined } })
-  if (category) active.push({ label: category.name, clear: { category: undefined } })
-  if (sort !== 'recent') active.push({ label: sort === 'price_asc' ? 'Prix croissant' : 'Prix décroissant', clear: { sort: undefined } })
-  if (filters.minPrice !== undefined) active.push({ label: `Min ${formatPrice(filters.minPrice)}`, clear: { minPrice: undefined } })
-  if (filters.maxPrice !== undefined) active.push({ label: `Max ${formatPrice(filters.maxPrice)}`, clear: { maxPrice: undefined } })
-  if (condition) active.push({ label: conditionLabel[condition], clear: { condition: undefined } })
+  // Filtres actifs en pastilles supprimables (reconnaissance plutôt que mémoire).
+  const active: { label: string; onRemove: () => void }[] = []
+  if (filters.q) active.push({ label: `« ${filters.q} »`, onRemove: () => update({ q: undefined }) })
+  if (category) active.push({ label: category.name, onRemove: () => update({ category: undefined }) })
+  if (city) active.push({ label: city, onRemove: () => setCity(null) })
+  if (sort !== 'recent') active.push({ label: sort === 'price_asc' ? 'Prix croissant' : 'Prix décroissant', onRemove: () => update({ sort: undefined }) })
+  if (filters.minPrice !== undefined) active.push({ label: `Min ${formatPrice(filters.minPrice)}`, onRemove: () => update({ minPrice: undefined }) })
+  if (filters.maxPrice !== undefined) active.push({ label: `Max ${formatPrice(filters.maxPrice)}`, onRemove: () => update({ maxPrice: undefined }) })
+  if (condition) active.push({ label: conditionLabel[condition], onRemove: () => update({ condition: undefined }) })
 
   const filterCount = [sort !== 'recent', filters.minPrice !== undefined, filters.maxPrice !== undefined, !!condition].filter(Boolean).length
+  const title = filters.q ? `Résultats pour « ${filters.q} »` : (category?.name ?? 'Toutes les annonces')
 
   return (
     <>
-      <nav aria-label="Fil d'Ariane" className={`mb-3 text-sm ${mutedText}`}>
-        <Link to="/" className="inline-flex min-h-11 items-center hover:text-brand-700 dark:hover:text-brand-500">← Accueil</Link>
-      </nav>
+      <Breadcrumb items={[{ label: 'Accueil', to: '/' }, { label: category?.name ?? 'Annonces' }]} />
+      <PageTitle title={title} fallback="/" />
 
-      <div className="mb-4 flex items-center justify-between gap-3">
-        <h1 className="font-display text-2xl font-extrabold">{filters.q ? `Résultats pour « ${filters.q} »` : (category?.name ?? 'Toutes les annonces')}</h1>
+      <div className="mb-4 flex flex-wrap items-center gap-2">
+        <div className="md:hidden"><CitySelector /></div>
         <button type="button" onClick={() => setFiltersOpen(true)} className={ghostButtonClass}>
           <SlidersHorizontal className="size-4" aria-hidden="true" /> Filtres
           {filterCount > 0 && <span className="rounded-full bg-brand-500 px-2 text-xs font-bold text-slate-950">{filterCount}</span>}
@@ -87,7 +94,7 @@ export function SearchPage() {
         <ul className="mb-4 flex flex-wrap gap-2" aria-label="Filtres actifs">
           {active.map((a) => (
             <li key={a.label}>
-              <button type="button" onClick={() => update(a.clear)} aria-label={`Retirer le filtre ${a.label}`} className={pillClass(false)}>
+              <button type="button" onClick={a.onRemove} aria-label={`Retirer le filtre ${a.label}`} className={pillClass(false)}>
                 {a.label} <X className="size-4" aria-hidden="true" />
               </button>
             </li>
@@ -98,7 +105,7 @@ export function SearchPage() {
       {listings.isPending && (
         <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5" aria-busy="true">
           {Array.from({ length: 6 }, (_, i) => (
-            <div key={i} className="aspect-3/4 animate-pulse rounded-2xl bg-slate-200 dark:bg-slate-800" />
+            <div key={i} className="skeleton aspect-3/4 rounded-2xl" />
           ))}
         </div>
       )}
@@ -112,16 +119,16 @@ export function SearchPage() {
 
       {listings.isSuccess && items.length === 0 && (
         <div className="py-16 text-center">
-          <p className="font-display text-xl font-extrabold">Aucune annonce ne correspond</p>
-          <p className={`mt-1 ${mutedText}`}>Essaie d'enlever un filtre ou de chercher autrement.</p>
-          <Link to="/search" className={`${primaryButtonClass} mt-5`}>Voir toutes les annonces</Link>
+          <p className="text-xl font-extrabold">Aucune annonce ne correspond</p>
+          <p className={`mt-1 ${mutedText}`}>Essayez de retirer un filtre ou de chercher autrement.</p>
+          <Link to="/search" onClick={() => setCity(null)} className={`${primaryButtonClass} mt-5`}>Voir toutes les annonces</Link>
         </div>
       )}
 
       {items.length > 0 && (
         <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5">
-          {items.map((listing) => (
-            <ListingCard key={listing.id} listing={listing} />
+          {items.map((listing, index) => (
+            <ListingCard key={listing.id} listing={listing} index={index} />
           ))}
         </div>
       )}

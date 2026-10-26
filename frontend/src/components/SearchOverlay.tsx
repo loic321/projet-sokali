@@ -9,7 +9,6 @@ import { Dialog } from './Dialog'
 function SearchContent({ onClose }: { onClose: () => void }) {
   const navigate = useNavigate()
   const categories = useCategories()
-  // Ce composant est monté à chaque ouverture : l'initialisation lit donc la liste à jour.
   const [recent] = useState(getRecentSearches)
 
   function go(term: string) {

@@ -6,6 +6,21 @@ const uuid = (group: number, n: number) =>
 
 const hoursAgo = (h: number) => new Date(Date.now() - h * 3_600_000).toISOString()
 
+// Images d'illustration générées (SVG) : elles servent à tester la galerie sans vraies photos.
+const demoImage = (title: string, category: number, i: number) => {
+  const hue = 18 + category * 47
+  const label = title.replace(/[&<>]/g, '').slice(0, 28)
+  const svg =
+    `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 600">` +
+    `<defs><linearGradient id="g" x1="0" y1="0" x2="1" y2="1">` +
+    `<stop offset="0" stop-color="hsl(${hue + i * 14} 85% 62%)"/>` +
+    `<stop offset="1" stop-color="hsl(${hue + 40 + i * 14} 80% 38%)"/></linearGradient></defs>` +
+    `<rect width="800" height="600" fill="url(#g)"/>` +
+    `<text x="400" y="300" text-anchor="middle" font-family="sans-serif" font-size="34" font-weight="700" fill="white" opacity=".92">${label}</text>` +
+    `<text x="400" y="352" text-anchor="middle" font-family="sans-serif" font-size="22" fill="white" opacity=".78">Photo d'illustration ${i + 1}/3</text></svg>`
+  return `data:image/svg+xml;utf8,${encodeURIComponent(svg)}`
+}
+
 export const categories: Category[] = [
   ['Électronique', 'electronique'],
   ['Véhicules', 'vehicules'],
@@ -43,7 +58,7 @@ const make = (
   status: 'ACTIVE',
   category: categories[category],
   seller: sellers[seller],
-  images: [],
+  images: [0, 1, 2].map((i) => ({ id: uuid(4, n * 10 + i), url: demoImage(title, category, i), position: i })),
   createdAt: hoursAgo(hours),
 })
 
