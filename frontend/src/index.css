@@ -100,3 +100,15 @@ dialog.panel-right[open] { animation: panel-in 0.25s ease-out; }
     scroll-behavior: auto !important;
   }
 }
+
+/* Feuille (bas d'écran sur mobile) et tiroir du menu */
+@keyframes sheet-in {
+  from { transform: translateY(100%); }
+  to { transform: none; }
+}
+dialog.sheet[open] { animation: sheet-in 0.25s ease-out; }
+dialog.menu-drawer[open] { animation: panel-in 0.25s ease-out; }
+@media (min-width: 768px) {
+  dialog.sheet[open] { animation: dialog-in 0.2s ease-out; }
+  dialog.sheet.drawer-md[open] { animation: panel-in 0.25s ease-out; }
+}
