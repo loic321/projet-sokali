@@ -57,4 +57,9 @@ export const handlers = [
           { status: 404 },
         )
   }),
+
+  // Coordonnées : numéro FICTIF et invalide, pour ne jamais écrire à une vraie personne.
+  http.get(`${API}/listings/:listingId/contact`, () => HttpResponse.json({ phone: '+237000000000' })),
+
+  http.post(`${API}/listings/:listingId/reports`, () => new HttpResponse(null, { status: 201 })),
 ]
