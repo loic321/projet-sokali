@@ -1,24 +1,14 @@
-import { ChevronLeft, ChevronRight } from 'lucide-react'
+import { ArrowRight, ChevronLeft, ChevronRight } from 'lucide-react'
 import { useCallback, useEffect, useRef, useState } from 'react'
 import type { ReactNode } from 'react'
 import { Link } from 'react-router-dom'
 
 const arrowClass =
-  'hidden size-11 items-center justify-center rounded-full border border-slate-200 text-slate-700 transition hover:border-brand-500 disabled:opacity-30 md:inline-flex dark:border-slate-700 dark:text-slate-200'
+  'inline-flex size-11 items-center justify-center rounded-full border border-slate-200 bg-white text-slate-700 shadow-sm transition hover:border-brand-500 hover:text-brand-700 disabled:opacity-30 max-md:hidden dark:border-slate-700 dark:bg-slate-900 dark:text-slate-200'
 
-// Rail horizontal : accroche sur chaque carte (scroll-snap), flèches sur ordinateur,
+// Rail horizontal : accroche sur chaque carte (scroll-snap), flèches sur tablette et ordinateur,
 // carte suivante qui dépasse pour signaler qu'on peut défiler.
-export function Rail({
-  title,
-  href,
-  children,
-  busy = false,
-}: {
-  title: string
-  href?: string
-  children: ReactNode
-  busy?: boolean
-}) {
+export function Rail({ title, href, children, busy = false }: { title: string; href?: string; children: ReactNode; busy?: boolean }) {
   const ref = useRef<HTMLDivElement>(null)
   const [edge, setEdge] = useState({ start: true, end: false })
 
@@ -40,16 +30,19 @@ export function Rail({
     ref.current?.scrollBy({ left: direction * ref.current.clientWidth * 0.8, behavior: 'smooth' })
 
   return (
-    <section aria-label={title} aria-busy={busy} className="mb-10">
-      <div className="mb-3 flex items-center justify-between gap-3">
-        <h2 className="font-display text-xl font-extrabold">{title}</h2>
-        <div className="flex items-center gap-1">
+    <section aria-label={title} aria-busy={busy} className="mb-10 md:mb-12">
+      <div className="mb-4 flex items-center justify-between gap-3">
+        <h2 className="flex items-center gap-3 text-xl font-extrabold sm:text-2xl">
+          <span aria-hidden="true" className="h-6 w-1.5 rounded-full bg-brand-500" />
+          {title}
+        </h2>
+        <div className="flex items-center gap-1.5">
           {href && (
             <Link
               to={href}
-              className="mr-2 inline-flex min-h-11 items-center text-sm font-semibold text-brand-700 hover:underline dark:text-brand-500"
+              className="mr-1 inline-flex min-h-11 items-center gap-1 rounded-full px-3 text-sm font-bold text-brand-700 transition hover:bg-brand-50 dark:text-brand-500 dark:hover:bg-slate-800"
             >
-              Voir tout
+              Voir tout <ArrowRight className="size-4" aria-hidden="true" />
             </Link>
           )}
           <button type="button" aria-label="Défiler vers la gauche" disabled={edge.start} onClick={() => scrollBy(-1)} className={arrowClass}>
@@ -66,7 +59,7 @@ export function Rail({
         tabIndex={0}
         role="group"
         aria-label={`${title}, liste défilante`}
-        className="no-scrollbar -mx-4 flex snap-x snap-mandatory scroll-px-4 gap-3 overflow-x-auto scroll-smooth px-4 pb-2"
+        className="no-scrollbar -mx-4 flex snap-x snap-mandatory scroll-px-4 gap-3 overflow-x-auto scroll-smooth px-4 pb-4 pt-1 md:gap-4"
       >
         {children}
       </div>
@@ -74,4 +67,4 @@ export function Rail({
   )
 }
 
-export const railItemClass = 'w-[44vw] max-w-56 shrink-0 snap-start sm:w-52 lg:w-56'
+export const railItemClass = 'w-[46vw] max-w-60 shrink-0 snap-start sm:w-56 lg:w-60'

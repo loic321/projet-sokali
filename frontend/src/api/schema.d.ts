@@ -196,6 +196,40 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/listings/{listingId}/contact": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Coordonnées du vendeur (utilisateur connecté uniquement) */
+        get: operations["getListingContact"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/listings/{listingId}/reports": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Signale une annonce */
+        post: operations["reportListing"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/me/favorites": {
         parameters: {
             query?: never;
@@ -390,6 +424,18 @@ export interface components {
             /** Format: uuid */
             categoryId?: string;
             status?: components["schemas"]["ListingStatus"];
+        };
+        ContactInfo: {
+            /**
+             * @description Numéro au format international
+             * @example +237600000001
+             */
+            phone: string;
+        };
+        ReportCreate: {
+            /** @enum {string} */
+            reason: "SCAM" | "PROHIBITED" | "WRONG_CATEGORY" | "OTHER";
+            details?: string;
         };
         MessageCreate: {
             body: string;
@@ -836,6 +882,57 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
+        };
+    };
+    getListingContact: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                listingId: components["parameters"]["ListingId"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Coordonnées du vendeur */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ContactInfo"];
+                };
+            };
+            401: components["responses"]["Unauthorized"];
+            404: components["responses"]["NotFound"];
+        };
+    };
+    reportListing: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                listingId: components["parameters"]["ListingId"];
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ReportCreate"];
+            };
+        };
+        responses: {
+            /** @description Signalement enregistré */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            404: components["responses"]["NotFound"];
         };
     };
     listFavorites: {

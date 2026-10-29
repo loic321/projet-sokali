@@ -23,3 +23,17 @@ export const pillClass = (active: boolean) =>
 // Texte secondaire : slate-500 passe le contraste AA (le slate-400 du v5 échouait).
 export const mutedText = 'text-slate-500 dark:text-slate-400'
 export const priceText = 'text-brand-700 dark:text-brand-500'
+
+const sheetBase =
+  'sheet fixed inset-x-0 bottom-0 top-auto m-0 w-full max-w-none overflow-hidden rounded-t-3xl border-0 bg-white p-0 text-slate-900 shadow-2xl backdrop:bg-slate-950/60 dark:bg-slate-900 dark:text-slate-100'
+
+export const sheetClass = `${sheetBase} max-h-[85dvh] md:inset-0 md:m-auto md:h-fit md:max-h-[80dvh] md:w-[min(440px,92vw)] md:rounded-3xl`
+
+export const drawerClass = `${sheetBase} drawer-md max-h-[88dvh] md:inset-y-0 md:left-auto md:right-0 md:h-dvh md:max-h-none md:w-[380px] md:rounded-none`
+
+export const whatsappButtonClass =
+  'inline-flex min-h-12 flex-1 items-center justify-center gap-2 rounded-full bg-emerald-700 px-5 text-sm font-bold text-white transition duration-200 hover:-translate-y-0.5 hover:bg-emerald-800 active:scale-[.97]'
+
+// Menu : tiroir à droite, visible seulement sous lg (1024 px).
+export const menuDrawerClass =
+  'menu-drawer fixed inset-y-0 left-auto right-0 m-0 h-dvh max-h-none w-[min(340px,88vw)] max-w-none overflow-hidden rounded-l-3xl border-0 bg-white p-0 text-slate-900 shadow-2xl backdrop:bg-slate-950/60 backdrop:backdrop-blur-sm lg:hidden dark:bg-slate-900 dark:text-slate-100'

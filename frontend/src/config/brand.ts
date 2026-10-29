@@ -2,6 +2,6 @@
 export const brand = {
   name: 'AVA Market',
   parts: ['AVA', 'Market'],
-  tagline: 'Achète, vends, près de chez toi.',
+  tagline: 'Achetez, vendez, près de chez vous.',
   currency: 'FCFA',
 } as const

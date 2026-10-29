@@ -260,6 +260,42 @@ paths:
         "404": { $ref: "#/components/responses/NotFound" }
         "413": { description: Fichier trop volumineux, content: { application/json: { schema: { $ref: "#/components/schemas/Error" } } } }
 
+  /listings/{listingId}/contact:
+    get:
+      tags: [Listings]
+      operationId: getListingContact
+      summary: Coordonnées du vendeur (utilisateur connecté uniquement)
+      security: [{ bearerAuth: [] }]
+      parameters:
+        - { $ref: "#/components/parameters/ListingId" }
+      responses:
+        "200":
+          description: Coordonnées du vendeur
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/ContactInfo" }
+        "401": { $ref: "#/components/responses/Unauthorized" }
+        "404": { $ref: "#/components/responses/NotFound" }
+
+  /listings/{listingId}/reports:
+    post:
+      tags: [Listings]
+      operationId: reportListing
+      summary: Signale une annonce
+      security: [{ bearerAuth: [] }]
+      parameters:
+        - { $ref: "#/components/parameters/ListingId" }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/ReportCreate" }
+      responses:
+        "201": { description: Signalement enregistré }
+        "400": { $ref: "#/components/responses/BadRequest" }
+        "401": { $ref: "#/components/responses/Unauthorized" }
+        "404": { $ref: "#/components/responses/NotFound" }
+
   /me/favorites:
     get:
       tags: [Favorites]
@@ -543,6 +579,19 @@ components:
         city: { type: string, minLength: 2, maxLength: 80 }
         categoryId: { type: string, format: uuid }
         status: { $ref: "#/components/schemas/ListingStatus" }
+
+    ContactInfo:
+      type: object
+      required: [phone]
+      properties:
+        phone: { type: string, example: "+237600000001", description: "Numéro au format international" }
+
+    ReportCreate:
+      type: object
+      required: [reason]
+      properties:
+        reason: { type: string, enum: [SCAM, PROHIBITED, WRONG_CATEGORY, OTHER] }
+        details: { type: string, maxLength: 500 }
 
     MessageCreate:
       type: object
