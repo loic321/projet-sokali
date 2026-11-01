@@ -14,10 +14,15 @@ const queryClient = new QueryClient({
 // Pour tout désactiver : VITE_USE_MOCKS=false.
 async function enableMocking() {
   if (import.meta.env.VITE_USE_MOCKS === 'false') return
-  const { worker } = await import('./mocks/browser')
-  await worker.start({
-    serviceWorker: { url: `${import.meta.env.BASE_URL}mockServiceWorker.js` },
-  })
+  try {
+    const { worker } = await import('./mocks/browser')
+    await worker.start({
+      serviceWorker: { url: `${import.meta.env.BASE_URL}mockServiceWorker.js` },
+    })
+  } catch (error) {
+    // Le faux serveur ne doit jamais empêcher l'application de s'afficher.
+    console.error('[MSW] démarrage impossible :', error)
+  }
 }
 
 enableMocking().then(() => {
